@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chilbi Herrliberg – Schichtplan v0.03</title>
+<title>Chilbi Herrliberg – Schichtplan v0.04</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -19,7 +19,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 
 /* ── HEADER ─────────────────────────────────────────────── */
 .site-header{background:var(--black);}
-.site-header-inner{max-width:1100px;margin:0 auto;padding:0 1rem;display:flex;align-items:center;height:54px;gap:12px;}
+.site-header-inner{width:100%;padding:0 1.5rem;display:flex;align-items:center;height:54px;gap:12px;}
 .logo-text{color:white;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;line-height:1.2;}
 .logo-text span{display:block;font-size:10px;font-weight:400;color:#999;text-transform:none;letter-spacing:0;}
 .red-stripe{height:4px;background:var(--red);}
@@ -36,7 +36,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 .legend-dot{width:10px;height:10px;}
 
 /* ── TABS ────────────────────────────────────────────────── */
-.container{max-width:1100px;margin:0 auto;padding:0 1rem;}
+.container{width:100%;padding:0 1.5rem;}
 .tabs{display:flex;gap:0;border-bottom:2px solid var(--black);background:var(--bg);overflow-x:auto;}
 .tab-btn{padding:12px 20px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text);opacity:.45;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;}
 .tab-btn:hover{opacity:.75;}
@@ -133,7 +133,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   <div class="site-header-inner">
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
-    <div class="header-version">v0.03</div>
+    <div class="header-version">v0.04</div>
   </div>
 </div>
 <div class="red-stripe"></div>
@@ -197,7 +197,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Chilbi Herrliberg &nbsp;·&nbsp; v0.03</div>
+<div class="site-footer">© Chilbi Herrliberg &nbsp;·&nbsp; v0.04</div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8UhuqtmDLOX7hFmyWkk6FhX9uT4E2IFsJs-PjN-hUHmjUXrHeuqJc5bvpZwnT-wRT4w/exec';
@@ -271,7 +271,7 @@ function buildUI() {
 }
 
 function dayType(id) { return id.startsWith('V') ? 'vorbereitung' : id.startsWith('N') ? 'nachbereitung' : 'anlass'; }
-function typeName(t) { return t==='vorbereitung'?'Vorbereitung':t==='nachbereitung'?'Nachbereitung':'Anlass'; }
+function typeName(t) { return t==='vorbereitung'?'Vorbereitung':t==='nachbereitung'?'Aufräumen':'Chilbi'; }
 
 function switchDay(i) {
   activeDay = i;
@@ -350,7 +350,7 @@ function buildTimeline(tagId, tagLabel) {
   }).join('');
 
   return `
-    <div class="day-header"><div class="day-title">${esc(tagLabel)}</div></div>
+    <div class="day-header">${buildDayHeader(tagLabel)}</div>
     <div class="timeline-wrap">
       <div class="timeline">
         ${rulerHtml}
@@ -370,6 +370,28 @@ function buildRuler(minT, maxT) {
     ticks += `<div class="hour-tick" style="left:calc(130px + (100% - 130px) * ${pct} / 100)">${h < 24 ? h : h-24}:00</div>`;
   }
   return `<div class="hour-ruler" style="position:relative;height:20px;border-bottom:1px solid var(--gray-mid)">${ticks}</div>`;
+}
+
+// ── DAY HEADER mit Datum + Wochentag ──────────────────────────
+const WEEKDAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+function buildDayHeader(label) {
+  // Versuche Datum aus Label zu lesen (z.B. "07.06.2025", "07.06.", "Samstag 07.06.2025")
+  const match = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})?/);
+  if (match) {
+    const day = parseInt(match[1]);
+    const month = parseInt(match[2]) - 1;
+    const year = match[3] ? parseInt(match[3]) : new Date().getFullYear();
+    const date = new Date(year, month, day);
+    if (!isNaN(date.getTime())) {
+      const wd = WEEKDAYS[date.getDay()];
+      // Zeige Wochentag nur wenn nicht bereits im Label
+      const hasWeekday = WEEKDAYS.some(w => label.includes(w));
+      const dateStr = `${String(day).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
+      return `<div class="day-title">${hasWeekday ? esc(label) : esc(wd+', '+label)}</div>
+              <div class="day-date">${dateStr}</div>`;
+    }
+  }
+  return `<div class="day-title">${esc(label)}</div>`;
 }
 
 // ── POPUP ─────────────────────────────────────────────────────
