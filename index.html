@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chilbi Herrliberg – Schichtplan v0.04</title>
+<title>Chilbi Herrliberg – Schichtplan v0.05</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -14,6 +14,8 @@
   --text:#1a1a1a;--text2:#555;--text3:#888;
   --green:#2d6a1f;--green-light:#eaf3e6;
   --blue:#1565c0;--blue-light:#e3f2fd;
+  --name-bar-h: 46px;
+  --ruler-h: 24px;
 }
 body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;font-size:14px;}
 
@@ -26,9 +28,9 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 .header-version{margin-left:auto;font-size:11px;color:#666;}
 
 /* ── NAMEBAR ─────────────────────────────────────────────── */
-.name-bar{background:var(--bg2);border-bottom:2px solid var(--gray-mid);padding:10px 1rem;position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.name-bar{background:var(--bg2);border-bottom:2px solid var(--gray-mid);padding:6px 1.5rem;position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;}
 .name-bar label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;}
-.name-input{height:34px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;background:white;color:var(--text);min-width:180px;max-width:240px;border-radius:0;}
+.name-input{height:32px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;background:white;color:var(--text);min-width:160px;max-width:220px;border-radius:0;}
 .name-input:focus{outline:none;border-color:var(--black);}
 .name-hint{font-size:11px;color:var(--text3);}
 .legend{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
@@ -36,9 +38,9 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 .legend-dot{width:10px;height:10px;}
 
 /* ── TABS ────────────────────────────────────────────────── */
-.container{width:100%;padding:0 1.5rem;}
-.tabs{display:flex;gap:0;border-bottom:2px solid var(--black);background:var(--bg);overflow-x:auto;}
-.tab-btn{padding:12px 20px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text);opacity:.45;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;}
+.tabs-wrap{background:var(--bg);border-bottom:2px solid var(--black);width:100%;}
+.tabs{display:flex;overflow-x:auto;width:100%;padding:0 1.5rem;}
+.tab-btn{padding:11px 18px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text);opacity:.45;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;}
 .tab-btn:hover{opacity:.75;}
 .tab-btn.active{opacity:1;border-bottom-color:var(--red);}
 .tab-type{display:inline-block;font-size:10px;padding:1px 5px;margin-left:5px;vertical-align:middle;font-weight:700;letter-spacing:0.04em;border:1px solid;}
@@ -47,47 +49,115 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 .tab-type.nachbereitung{background:var(--green-light);color:var(--green);border-color:var(--green);}
 
 /* ── DAY PANEL ───────────────────────────────────────────── */
-.day-panel{display:none;padding:1.5rem 0 4rem;}
+.day-panel{display:none;padding:1.25rem 1.5rem 4rem;}
 .day-panel.active{display:block;}
-.day-header{margin-bottom:1.25rem;}
-.day-title{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.day-header{margin-bottom:1rem;}
+.day-title{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text3);}
 
 /* ── TIMELINE ────────────────────────────────────────────── */
-.timeline-wrap{overflow-x:auto;padding-bottom:8px;}
-.timeline{position:relative;min-width:700px;}
-.hour-ruler{position:relative;height:20px;padding-left:130px;border-bottom:1px solid var(--gray-mid);margin-bottom:0;}
-.hour-tick{position:absolute;font-size:10px;color:var(--text3);border-left:1px solid var(--gray-mid);padding-left:3px;top:4px;}
-.schicht-group{margin-bottom:1.5rem;}
-.schicht-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);padding:6px 0 4px;border-bottom:1px solid var(--gray-mid);margin-bottom:6px;}
-.task-row{display:flex;align-items:center;height:44px;margin-bottom:4px;}
-.task-name{width:126px;min-width:126px;font-size:12px;font-weight:600;padding-right:10px;line-height:1.2;color:var(--text2);}
-.task-track{flex:1;height:36px;background:rgba(0,0,0,.04);position:relative;overflow:hidden;border:1px solid var(--gray-mid);}
+/* Outer wrapper scrolls horizontally */
+.timeline-wrap{overflow-x:auto;overflow-y:visible;padding-bottom:8px;position:relative;}
 
-/* Block states */
+/* Inner fixed-layout grid */
+.timeline{
+  display:grid;
+  /* col 1 = task name (fixed), col 2 = track area */
+  grid-template-columns:130px 1fr;
+  min-width:700px;
+  position:relative;
+}
+
+/* Sticky ruler row spans full width */
+.ruler-row{
+  grid-column:1/-1;
+  display:grid;
+  grid-template-columns:130px 1fr;
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:var(--bg3);
+  border-bottom:1px solid var(--gray-mid);
+}
+.ruler-spacer{background:var(--bg3);}
+.ruler-ticks{position:relative;height:var(--ruler-h);overflow:visible;}
+.hour-tick{position:absolute;font-size:10px;color:var(--text3);border-left:1px solid var(--gray-mid);padding-left:3px;top:5px;white-space:nowrap;}
+
+/* Schicht group */
+.schicht-group{grid-column:1/-1;display:contents;}
+.schicht-header-row{
+  grid-column:1/-1;
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;
+  color:var(--gray);padding:8px 0 4px;
+  border-bottom:1px solid var(--gray-mid);margin-bottom:0;
+}
+
+/* Task row: name cell + track cell */
+.task-name-cell{
+  /* sticky left */
+  position:sticky;left:0;z-index:5;
+  background:var(--bg3);
+  display:flex;align-items:center;
+  font-size:12px;font-weight:600;color:var(--text2);
+  padding-right:10px;
+  min-height:44px;
+}
+.task-track-cell{
+  position:relative;
+  height:44px;
+  display:flex;align-items:center;
+}
+.task-track{
+  position:relative;width:100%;height:36px;
+  background:rgba(0,0,0,.04);
+  border:1px solid var(--gray-mid);
+  overflow:visible;
+}
+
+/* Signup pills under block */
+.signup-name-cell{position:sticky;left:0;z-index:5;background:var(--bg3);}
+.signup-pills-cell{padding:2px 0 6px;display:flex;flex-wrap:wrap;gap:4px;align-items:flex-start;}
+.signup-pill{font-size:11px;padding:1px 8px;background:var(--bg2);border:1px solid var(--gray-mid);color:var(--text2);}
+.signup-pill.me{background:var(--black);color:white;border-color:var(--black);}
+
+/* ── BLOCK STATES ────────────────────────────────────────── */
 .task-block{
   position:absolute;top:3px;height:calc(100% - 6px);
   cursor:pointer;display:flex;align-items:center;gap:6px;
-  font-size:11px;font-weight:700;color:white;
+  font-size:11px;font-weight:700;
   transition:filter .15s;user-select:none;overflow:hidden;padding:0 8px;
-  text-shadow:0 1px 2px rgba(0,0,0,.3);
 }
-.task-block:hover{filter:brightness(1.1);}
-/* State: frei → Aufgaben-Farbe, normal */
-/* State: andere → Farbe, leicht gedimmt */
-.task-block.andere{opacity:.75;}
-/* State: mine → Farbe + weisser Rahmen */
-.task-block.mine{box-shadow:0 0 0 2px white,0 0 0 4px rgba(0,0,0,.4);}
-/* State: voll → grau */
-.task-block.voll{background:#999 !important;cursor:not-allowed;opacity:.6;}
+.task-block:hover{filter:brightness(1.08);}
 
-.block-time{opacity:.85;font-weight:400;font-size:10px;}
-.block-slots{display:flex;gap:3px;align-items:center;}
-.slot-dot{width:7px;height:7px;border-radius:0;background:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.6);}
-.slot-dot.taken{background:rgba(255,255,255,.9);}
+/* frei: volle Farbe, weisse Schrift (oder schwarz je nach Helligkeit) */
+/* andere: Farbe mit Overlay-Streifen */
+.task-block.andere::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(135deg,rgba(0,0,0,.12) 0px,rgba(0,0,0,.12) 2px,transparent 2px,transparent 6px);
+  pointer-events:none;
+}
+/* mine: schwarzer Hintergrund */
+.task-block.mine{background:var(--black) !important;color:white !important;}
+/* voll: grau, kein Cursor */
+.task-block.voll{background:#aaa !important;cursor:not-allowed;color:white !important;}
+.task-block.voll:hover{filter:none;}
 
-.signup-list{display:flex;flex-wrap:wrap;gap:4px;padding-left:130px;margin-top:-1px;margin-bottom:6px;}
-.signup-pill{font-size:11px;padding:1px 8px;background:var(--bg2);border:1px solid var(--gray-mid);color:var(--text2);}
-.signup-pill.me{background:var(--black);color:white;border-color:var(--black);}
+.block-time{font-weight:400;font-size:10px;opacity:.9;}
+.block-slots{display:flex;gap:3px;align-items:center;margin-left:auto;}
+
+/* Slot dots: free = outlined, taken = solid white, contrast on dark */
+.slot-dot{
+  width:8px;height:8px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.8);
+  background:transparent;
+  flex-shrink:0;
+}
+.slot-dot.taken{
+  background:rgba(255,255,255,.95);
+  border-color:rgba(255,255,255,.95);
+}
+/* On dark/mine blocks keep same */
+.task-block.mine .slot-dot{border-color:rgba(255,255,255,.5);}
+.task-block.mine .slot-dot.taken{background:white;border-color:white;}
 
 /* ── POPUP ───────────────────────────────────────────────── */
 .popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:20px;}
@@ -98,17 +168,18 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 .popup-header h3{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
 .popup-header .popup-meta{font-size:11px;color:#999;margin-top:3px;}
 .popup-body{padding:20px;}
-.popup-info{background:var(--bg2);border-left:3px solid var(--red);padding:12px 14px;margin-bottom:16px;font-size:13px;}
+.popup-info{background:var(--bg2);border-left:3px solid var(--red);padding:12px 14px;margin-bottom:14px;font-size:13px;}
 .pi-row{display:flex;justify-content:space-between;margin-bottom:3px;}
 .pi-row:last-child{margin-bottom:0;}
 .pi-label{color:var(--text3);}
 .pi-value{font-weight:700;}
-.popup-treffpunkt{background:var(--red-light);border-left:3px solid var(--red);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--red-dark);}
+.popup-treffpunkt{background:var(--red-light);border-left:3px solid var(--red);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--red-dark);}
 .popup-treffpunkt strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
-.popup-name-display{background:var(--bg2);border:1px solid var(--gray-mid);padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:16px;}
+.popup-name-display{background:var(--bg2);border:1px solid var(--gray-mid);padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:14px;}
 .popup-name-display small{display:block;font-size:10px;font-weight:400;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;}
-.popup-full{background:var(--red-light);border:1px solid var(--red);padding:14px 16px;font-size:13px;color:var(--red-dark);font-weight:600;text-align:center;}
-.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+.popup-name-hint{font-size:11px;color:var(--red);margin-top:4px;font-weight:600;}
+.popup-full{background:var(--red-light);border:1px solid var(--red);padding:14px 16px;font-size:13px;color:var(--red-dark);font-weight:600;text-align:center;line-height:1.5;}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
 .btn{height:36px;padding:0 18px;border:2px solid var(--black);background:var(--bg);color:var(--black);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit;border-radius:0;}
 .btn:hover{background:var(--black);color:#fff;}
 .btn-red{background:var(--red);color:#fff;border-color:var(--red);}
@@ -133,34 +204,32 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   <div class="site-header-inner">
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
-    <div class="header-version">v0.04</div>
+    <div class="header-version">v0.05</div>
   </div>
 </div>
 <div class="red-stripe"></div>
 
 <!-- NAME BAR -->
 <div class="name-bar">
-  <label for="myName">Dein Name:</label>
-  <input type="text" id="myName" class="name-input" placeholder="Vorname Nachname" autocomplete="name">
+  <label for="myName">Dein Name oder Kürzel:</label>
+  <input type="text" id="myName" class="name-input" autocomplete="name">
   <span class="name-hint">Name eingeben, dann auf Schicht klicken zum Eintragen.</span>
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#2e7d32"></div>Platz frei</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Platz frei</div>
     <div class="legend-item"><div class="legend-dot" style="background:var(--black)"></div>Du eingetragen</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#e65100"></div>Andere eingetragen</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#999"></div>Voll</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red);opacity:.45"></div>Andere eingetragen</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#aaa"></div>Voll</div>
   </div>
 </div>
 
 <!-- TABS -->
-<div style="background:var(--bg);border-bottom:none;">
-  <div class="container">
-    <div class="tabs" id="tabBar"></div>
-  </div>
+<div class="tabs-wrap">
+  <div class="tabs" id="tabBar"></div>
 </div>
 
 <!-- CONTENT -->
-<div class="container" id="dayPanels">
-  <div class="loading" id="loadingState">
+<div id="dayPanels">
+  <div class="loading" id="loadingState" style="padding:3rem 1.5rem">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg>
     Daten werden geladen…
   </div>
@@ -175,7 +244,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
     </div>
     <div class="popup-body">
       <div id="popupFull" class="popup-full" style="display:none">
-        Diese Schicht ist schon voll. Es hat aber noch viele andere frei&nbsp;:)
+        Diese Schicht ist schon voll.<br>Es hat aber noch viele andere frei&nbsp;:)
       </div>
       <div id="popupNormal">
         <div class="popup-info" id="popupInfo"></div>
@@ -186,6 +255,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
         <div class="popup-name-display">
           <small>Eintragen als</small>
           <span id="popupNameDisplay">–</span>
+          <div id="popupNameHint" class="popup-name-hint" style="display:none">⚠ Bitte zuerst Namen oben eingeben!</div>
         </div>
         <div class="btn-row">
           <button class="btn" onclick="closePopup()">Abbrechen</button>
@@ -197,17 +267,26 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Chilbi Herrliberg &nbsp;·&nbsp; v0.04</div>
+<div class="site-footer">© Chilbi Herrliberg &nbsp;·&nbsp; v0.05</div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8UhuqtmDLOX7hFmyWkk6FhX9uT4E2IFsJs-PjN-hUHmjUXrHeuqJc5bvpZwnT-wRT4w/exec';
-const PALETTE = ['#c0392b','#1565c0','#2e7d32','#6a1b9a','#00695c','#e65100','#4527a0','#00838f','#558b2f'];
 
 let CONFIG  = [];
 let SIGNUPS = [];
 let DAYS    = [];
 let activeDay = 0;
 let currentTarget = null;
+
+// Automatische Schriftfarbe nach Hintergrundfarbe
+function textColor(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  // Relative luminance
+  const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+  return lum > 0.55 ? '#1a1a1a' : '#ffffff';
+}
 
 window.addEventListener('DOMContentLoaded', async () => {
   const saved = localStorage.getItem('chilbi_name');
@@ -244,6 +323,7 @@ async function loadData() {
   }
 }
 
+// ── BUILD UI ──────────────────────────────────────────────────
 function buildUI() {
   const dayMap = {};
   CONFIG.forEach(row => {
@@ -258,7 +338,7 @@ function buildUI() {
 
   document.getElementById('tabBar').innerHTML = DAYS.map((d, i) => `
     <button class="tab-btn ${i===0?'active':''}" onclick="switchDay(${i})">
-      ${esc(d.label)}
+      ${esc(tabLabel(d.label))}
       <span class="tab-type ${d.type}">${typeName(d.type)}</span>
     </button>
   `).join('');
@@ -270,8 +350,42 @@ function buildUI() {
   `).join('');
 }
 
-function dayType(id) { return id.startsWith('V') ? 'vorbereitung' : id.startsWith('N') ? 'nachbereitung' : 'anlass'; }
+function dayType(id) { return id.startsWith('V')?'vorbereitung':id.startsWith('N')?'nachbereitung':'anlass'; }
 function typeName(t) { return t==='vorbereitung'?'Vorbereitung':t==='nachbereitung'?'Aufräumen':'Chilbi'; }
+
+// Tabs: nur Wochentag anzeigen (kein Datum)
+const WEEKDAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+function tabLabel(label) {
+  // Hat Label bereits einen Wochentag?
+  const existing = WEEKDAYS.find(w => label.includes(w));
+  if (existing) return existing;
+  // Datum parsen und Wochentag zurückgeben
+  const m = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})?/);
+  if (m) {
+    const d = new Date(m[3]?parseInt(m[3]):new Date().getFullYear(), parseInt(m[2])-1, parseInt(m[1]));
+    if (!isNaN(d.getTime())) return WEEKDAYS[d.getDay()];
+  }
+  return label; // Fallback
+}
+
+// Tagesheader: Wochentag gross + Datum darunter (kein Duplikat)
+function buildDayHeader(label) {
+  const m = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})?/);
+  if (m) {
+    const day   = parseInt(m[1]);
+    const month = parseInt(m[2]) - 1;
+    const year  = m[3] ? parseInt(m[3]) : new Date().getFullYear();
+    const date  = new Date(year, month, day);
+    if (!isNaN(date.getTime())) {
+      const wd  = WEEKDAYS[date.getDay()];
+      const dateStr = `${String(day).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
+      const existing = WEEKDAYS.find(w => label.includes(w));
+      const titleStr = existing ? label : `${wd}, ${dateStr}`;
+      return `<div class="day-title">${esc(titleStr)}</div>`;
+    }
+  }
+  return `<div class="day-title">${esc(label)}</div>`;
+}
 
 function switchDay(i) {
   activeDay = i;
@@ -279,6 +393,7 @@ function switchDay(i) {
   document.querySelectorAll('.day-panel').forEach((p,j) => p.classList.toggle('active', i===j));
 }
 
+// ── TIMELINE ─────────────────────────────────────────────────
 function buildTimeline(tagId, tagLabel) {
   const rows = CONFIG.filter(r => r.Tag === tagId);
   if (!rows.length) return '<div class="empty">Keine Schichten geplant.</div>';
@@ -294,44 +409,54 @@ function buildTimeline(tagId, tagLabel) {
     schichtMap[r.Schicht].push(r);
   });
 
-  const rulerHtml = buildRuler(minT, maxT);
-  const colorFor = r => r.Farbe || PALETTE[colorIdx(r.Aufgabe) % PALETTE.length];
+  // Ruler ticks
+  const startH = Math.floor(minT / 60);
+  const endH   = Math.ceil(maxT / 60);
+  let ticks = '';
+  for (let h = startH; h <= endH; h++) {
+    const pct = ((h * 60 - minT) / spanMin * 100).toFixed(3);
+    ticks += `<div class="hour-tick" style="left:${pct}%">${(h%24)}:00</div>`;
+  }
 
-  const schichtRows = Object.entries(schichtMap).map(([sch, tasks]) => {
-    const taskHtml = tasks.map(r => {
+  let gridRows = '';
+
+  Object.entries(schichtMap).forEach(([sch, tasks]) => {
+    gridRows += `<div class="schicht-header-row" style="padding-left:0"><span style="padding-left:0">${esc(sch)}</span></div>`;
+
+    tasks.forEach(r => {
       const vonM    = parseTime(r.Von);
       const bisM    = parseTime(r.Bis, vonM);
-      const leftPct = ((vonM - minT) / spanMin * 100).toFixed(2);
-      const widePct = ((bisM - vonM) / spanMin * 100).toFixed(2);
-      const color   = colorFor(r);
+      const leftPct = ((vonM - minT) / spanMin * 100).toFixed(3);
+      const widePct = ((bisM - vonM) / spanMin * 100).toFixed(3);
+      const color   = r.Farbe || '#CC0000';
       const taken   = signupsFor(tagId, sch, r.Aufgabe);
       const max     = parseInt(r.MaxPersonen) || 1;
       const isFull  = taken.length >= max;
       const isMine  = myName() && taken.some(s => s.Name === myName());
       const hasOther= taken.length > 0 && !isMine;
 
-      // 4 Zustände
       let cls = '';
       let blockColor = color;
-      if (isMine)        { cls = 'mine'; }
-      else if (isFull)   { cls = 'voll'; blockColor = '#999'; }
-      else if (hasOther) { cls = 'andere'; }
-      // else: frei → standard
+      if      (isMine)  { cls = 'mine'; blockColor = '#1a1a1a'; }
+      else if (isFull)  { cls = 'voll'; blockColor = '#aaa'; }
+      else if (hasOther){ cls = 'andere'; }
+
+      const fgColor = (cls==='mine'||cls==='voll') ? '#ffffff' : textColor(blockColor);
 
       const dots = Array.from({length: max}, (_,i) =>
         `<div class="slot-dot${i < taken.length?' taken':''}"></div>`
       ).join('');
 
-      const signupList = taken.map(s =>
-        `<div class="signup-pill${s.Name===myName()?' me':''}">${esc(s.Name)}</div>`
+      const signupPills = taken.map(s =>
+        `<span class="signup-pill${s.Name===myName()?' me':''}">${esc(s.Name)}</span>`
       ).join('');
 
-      return `
-        <div class="task-row">
-          <div class="task-name">${esc(r.Aufgabe)}</div>
+      gridRows += `
+        <div class="task-name-cell">${esc(r.Aufgabe)}</div>
+        <div class="task-track-cell">
           <div class="task-track">
             <div class="task-block ${cls}"
-              style="left:${leftPct}%;width:${widePct}%;background:${blockColor}"
+              style="left:${leftPct}%;width:${widePct}%;background:${blockColor};color:${fgColor}"
               onclick="openPopup('${esc(tagId)}','${esc(sch)}','${esc(r.Aufgabe)}','${esc(r.Von)}','${esc(r.Bis)}',${max},'${esc(r.Informationen||'')}')"
               title="${esc(r.Aufgabe)} | ${esc(r.Von)}–${esc(r.Bis)}">
               <span class="block-time">${esc(r.Von)}–${esc(r.Bis)}</span>
@@ -339,59 +464,30 @@ function buildTimeline(tagId, tagLabel) {
             </div>
           </div>
         </div>
-        ${taken.length ? `<div class="signup-list">${signupList}</div>` : ''}
       `;
-    }).join('');
 
-    return `<div class="schicht-group">
-      <div class="schicht-label">${esc(sch)}</div>
-      ${taskHtml}
-    </div>`;
-  }).join('');
+      // Pills row: only if there are signups
+      if (taken.length) {
+        gridRows += `
+          <div class="signup-name-cell"></div>
+          <div class="signup-pills-cell">${signupPills}</div>
+        `;
+      }
+    });
+  });
 
   return `
     <div class="day-header">${buildDayHeader(tagLabel)}</div>
     <div class="timeline-wrap">
       <div class="timeline">
-        ${rulerHtml}
-        <div style="margin-top:12px">${schichtRows}</div>
+        <div class="ruler-row">
+          <div class="ruler-spacer"></div>
+          <div class="ruler-ticks">${ticks}</div>
+        </div>
+        ${gridRows}
       </div>
     </div>
   `;
-}
-
-function buildRuler(minT, maxT) {
-  const startH = Math.floor(minT / 60);
-  const endH   = Math.ceil(maxT / 60);
-  const spanMin = maxT - minT;
-  let ticks = '';
-  for (let h = startH; h <= endH; h++) {
-    const pct = ((h * 60 - minT) / spanMin * 100).toFixed(2);
-    ticks += `<div class="hour-tick" style="left:calc(130px + (100% - 130px) * ${pct} / 100)">${h < 24 ? h : h-24}:00</div>`;
-  }
-  return `<div class="hour-ruler" style="position:relative;height:20px;border-bottom:1px solid var(--gray-mid)">${ticks}</div>`;
-}
-
-// ── DAY HEADER mit Datum + Wochentag ──────────────────────────
-const WEEKDAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
-function buildDayHeader(label) {
-  // Versuche Datum aus Label zu lesen (z.B. "07.06.2025", "07.06.", "Samstag 07.06.2025")
-  const match = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})?/);
-  if (match) {
-    const day = parseInt(match[1]);
-    const month = parseInt(match[2]) - 1;
-    const year = match[3] ? parseInt(match[3]) : new Date().getFullYear();
-    const date = new Date(year, month, day);
-    if (!isNaN(date.getTime())) {
-      const wd = WEEKDAYS[date.getDay()];
-      // Zeige Wochentag nur wenn nicht bereits im Label
-      const hasWeekday = WEEKDAYS.some(w => label.includes(w));
-      const dateStr = `${String(day).padStart(2,'0')}.${String(month+1).padStart(2,'0')}.${year}`;
-      return `<div class="day-title">${hasWeekday ? esc(label) : esc(wd+', '+label)}</div>
-              <div class="day-date">${dateStr}</div>`;
-    }
-  }
-  return `<div class="day-title">${esc(label)}</div>`;
 }
 
 // ── POPUP ─────────────────────────────────────────────────────
@@ -404,17 +500,14 @@ function openPopup(tag, schicht, aufgabe, von, bis, max, info) {
   document.getElementById('popupTitle').textContent = 'Schicht eintragen';
   document.getElementById('popupMeta').textContent  = `${tag} · ${schicht}`;
 
-  // Voll-Meldung
   const fullEl   = document.getElementById('popupFull');
   const normalEl = document.getElementById('popupNormal');
   if (isFull) {
-    fullEl.style.display   = '';
-    normalEl.style.display = 'none';
+    fullEl.style.display = ''; normalEl.style.display = 'none';
     document.getElementById('popupOverlay').classList.add('open');
     return;
   }
-  fullEl.style.display   = 'none';
-  normalEl.style.display = '';
+  fullEl.style.display = 'none'; normalEl.style.display = '';
 
   document.getElementById('popupInfo').innerHTML = `
     <div class="pi-row"><span class="pi-label">Aufgabe</span><span class="pi-value">${esc(aufgabe)}</span></div>
@@ -423,7 +516,6 @@ function openPopup(tag, schicht, aufgabe, von, bis, max, info) {
     ${taken.length ? `<div class="pi-row"><span class="pi-label">Eingetragen</span><span class="pi-value">${taken.map(s=>esc(s.Name)).join(', ')}</span></div>` : ''}
   `;
 
-  // Treffpunkt/Info
   const treffEl = document.getElementById('popupTreffpunkt');
   if (info && info.trim()) {
     treffEl.style.display = '';
@@ -432,14 +524,19 @@ function openPopup(tag, schicht, aufgabe, von, bis, max, info) {
     treffEl.style.display = 'none';
   }
 
-  // Name
-  document.getElementById('popupNameDisplay').textContent = name || '(kein Name eingegeben)';
-
-  // Button reset
-  const btn = document.getElementById('btnSign');
-  btn.disabled = false;
+  const nameDisplay = document.getElementById('popupNameDisplay');
+  const nameHint    = document.getElementById('popupNameHint');
+  const btn         = document.getElementById('btnSign');
+  if (name) {
+    nameDisplay.textContent = name;
+    nameHint.style.display  = 'none';
+    btn.disabled = false;
+  } else {
+    nameDisplay.textContent = '–';
+    nameHint.style.display  = '';
+    btn.disabled = true;
+  }
   btn.textContent = 'Eintragen';
-
   document.getElementById('popupOverlay').classList.add('open');
 }
 
@@ -451,17 +548,12 @@ function closePopup() {
 async function doSign() {
   const name = myName();
   if (!name) { showToast('Bitte zuerst Namen eingeben.', 'error'); closePopup(); return; }
-
   const { tag, schicht, aufgabe } = currentTarget;
   if (signupsFor(tag, schicht, aufgabe).some(s => s.Name === name)) {
     showToast('Du bist bereits eingetragen.', 'error'); closePopup(); return;
   }
-
-  // Sofort ausgrauen
   const btn = document.getElementById('btnSign');
-  btn.disabled = true;
-  btn.textContent = 'Speichert…';
-
+  btn.disabled = true; btn.textContent = 'Speichert…';
   try {
     const r = await fetch(SCRIPT_URL, {
       method: 'POST',
@@ -474,8 +566,7 @@ async function doSign() {
     showToast('✓ Eingetragen: ' + name, 'success');
     rebuildActivePanel();
   } catch(e) {
-    btn.disabled = false;
-    btn.textContent = 'Eintragen';
+    btn.disabled = false; btn.textContent = 'Eintragen';
     showToast('Fehler: ' + e.message, 'error');
   }
 }
@@ -496,13 +587,11 @@ function signupsFor(tag, schicht, aufgabe) {
   return SIGNUPS.filter(s => s.Tag===tag && s.Schicht===schicht && s.Aufgabe===aufgabe);
 }
 function myName() { return document.getElementById('myName')?.value.trim() || localStorage.getItem('chilbi_name') || ''; }
-let _colorMap={}, _colorCounter=0;
-function colorIdx(key) { if(_colorMap[key]===undefined) _colorMap[key]=_colorCounter++; return _colorMap[key]; }
-function esc(s) { return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function esc(s) { return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function showToast(msg, type='') {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast'+(type?' '+type:''); t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3200);
+  t.textContent = msg; t.className='toast'+(type?' '+type:''); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3200);
 }
 </script>
 </body>
