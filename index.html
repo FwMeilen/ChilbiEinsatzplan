@@ -3,515 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chilbi Herrliberg – Schichtplan v0.02</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Chilbi Herrliberg – Schichtplan v0.03</title>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── RESET & BASE ─────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --red:#CC0000;--red-dark:#990000;--red-light:#FDEAEA;
+  --black:#1a1a1a;--gray:#666;--gray-mid:#e0e0e0;
+  --bg:#fff;--bg2:#f4f4f4;--bg3:#e8e8e8;
+  --text:#1a1a1a;--text2:#555;--text3:#888;
+  --green:#2d6a1f;--green-light:#eaf3e6;
+  --blue:#1565c0;--blue-light:#e3f2fd;
+}
+body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;font-size:14px;}
 
-:root {
-  --ink:        #1a1208;
-  --paper:      #fdf6e8;
-  --cream:      #f5ead2;
-  --gold:       #c9921a;
-  --gold-light: #f0c85a;
-  --red:        #c0392b;
-  --green:      #2e7d32;
-  --blue:       #1565c0;
-  --purple:     #6a1b9a;
-  --teal:       #00695c;
-  --orange:     #e65100;
-  --border:     rgba(26,18,8,.15);
-  --shadow:     0 4px 24px rgba(26,18,8,.12);
-}
+/* ── HEADER ─────────────────────────────────────────────── */
+.site-header{background:var(--black);}
+.site-header-inner{max-width:1100px;margin:0 auto;padding:0 1rem;display:flex;align-items:center;height:54px;gap:12px;}
+.logo-text{color:white;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;line-height:1.2;}
+.logo-text span{display:block;font-size:10px;font-weight:400;color:#999;text-transform:none;letter-spacing:0;}
+.red-stripe{height:4px;background:var(--red);}
+.header-version{margin-left:auto;font-size:11px;color:#666;}
 
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--paper);
-  color: var(--ink);
-  min-height: 100vh;
-}
+/* ── NAMEBAR ─────────────────────────────────────────────── */
+.name-bar{background:var(--bg2);border-bottom:2px solid var(--gray-mid);padding:10px 1rem;position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.name-bar label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;}
+.name-input{height:34px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;background:white;color:var(--text);min-width:180px;max-width:240px;border-radius:0;}
+.name-input:focus{outline:none;border-color:var(--black);}
+.name-hint{font-size:11px;color:var(--text3);}
+.legend{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.legend-dot{width:10px;height:10px;}
 
-/* ── HERO ─────────────────────────────────────────────────── */
-.hero {
-  background: var(--ink);
-  color: var(--paper);
-  padding: 48px 24px 36px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 40px,
-    rgba(201,146,26,.08) 40px,
-    rgba(201,146,26,.08) 41px
-  );
-}
-.hero-inner { position: relative; z-index: 1; }
-.hero h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2.2rem, 6vw, 4rem);
-  font-weight: 900;
-  letter-spacing: -.02em;
-  line-height: 1.1;
-}
-.hero h1 span { color: var(--gold-light); }
-.hero-sub {
-  margin-top: 10px;
-  font-size: 1rem;
-  opacity: .75;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-}
-.hero-dates {
-  margin-top: 20px;
-  display: inline-flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.hero-date {
-  background: rgba(201,146,26,.2);
-  border: 1px solid rgba(240,200,90,.3);
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: .85rem;
-  color: var(--gold-light);
-}
+/* ── TABS ────────────────────────────────────────────────── */
+.container{max-width:1100px;margin:0 auto;padding:0 1rem;}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--black);background:var(--bg);overflow-x:auto;}
+.tab-btn{padding:12px 20px;border:none;background:none;font-family:inherit;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text);opacity:.45;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;}
+.tab-btn:hover{opacity:.75;}
+.tab-btn.active{opacity:1;border-bottom-color:var(--red);}
+.tab-type{display:inline-block;font-size:10px;padding:1px 5px;margin-left:5px;vertical-align:middle;font-weight:700;letter-spacing:0.04em;border:1px solid;}
+.tab-type.vorbereitung{background:var(--blue-light);color:var(--blue);border-color:var(--blue);}
+.tab-type.anlass{background:var(--red-light);color:var(--red);border-color:var(--red);}
+.tab-type.nachbereitung{background:var(--green-light);color:var(--green);border-color:var(--green);}
 
-/* ── LAYOUT ───────────────────────────────────────────────── */
-.container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+/* ── DAY PANEL ───────────────────────────────────────────── */
+.day-panel{display:none;padding:1.5rem 0 4rem;}
+.day-panel.active{display:block;}
+.day-header{margin-bottom:1.25rem;}
+.day-title{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
 
-/* ── NAME BANNER ──────────────────────────────────────────── */
-.name-bar {
-  background: var(--cream);
-  border-bottom: 2px solid var(--border);
-  padding: 16px 20px;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.name-bar label { font-weight: 600; white-space: nowrap; font-size: .9rem; }
-.name-input {
-  flex: 1;
-  min-width: 160px;
-  max-width: 260px;
-  padding: 8px 14px;
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: .95rem;
-  background: white;
-  color: var(--ink);
-  transition: border-color .2s;
-}
-.name-input:focus { outline: none; border-color: var(--gold); }
-.name-hint { font-size: .82rem; opacity: .55; }
-.legend {
-  margin-left: auto;
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-.legend-item { display: flex; align-items: center; gap: 5px; font-size: .78rem; }
-.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+/* ── TIMELINE ────────────────────────────────────────────── */
+.timeline-wrap{overflow-x:auto;padding-bottom:8px;}
+.timeline{position:relative;min-width:700px;}
+.hour-ruler{position:relative;height:20px;padding-left:130px;border-bottom:1px solid var(--gray-mid);margin-bottom:0;}
+.hour-tick{position:absolute;font-size:10px;color:var(--text3);border-left:1px solid var(--gray-mid);padding-left:3px;top:4px;}
+.schicht-group{margin-bottom:1.5rem;}
+.schicht-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);padding:6px 0 4px;border-bottom:1px solid var(--gray-mid);margin-bottom:6px;}
+.task-row{display:flex;align-items:center;height:44px;margin-bottom:4px;}
+.task-name{width:126px;min-width:126px;font-size:12px;font-weight:600;padding-right:10px;line-height:1.2;color:var(--text2);}
+.task-track{flex:1;height:36px;background:rgba(0,0,0,.04);position:relative;overflow:hidden;border:1px solid var(--gray-mid);}
 
-/* ── TABS ─────────────────────────────────────────────────── */
-.tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 2px solid var(--border);
-  background: var(--paper);
-  overflow-x: auto;
+/* Block states */
+.task-block{
+  position:absolute;top:3px;height:calc(100% - 6px);
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;color:white;
+  transition:filter .15s;user-select:none;overflow:hidden;padding:0 8px;
+  text-shadow:0 1px 2px rgba(0,0,0,.3);
 }
-.tab-btn {
-  padding: 14px 22px;
-  border: none;
-  background: none;
-  font-family: inherit;
-  font-size: .9rem;
-  font-weight: 500;
-  color: var(--ink);
-  opacity: .5;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
-  white-space: nowrap;
-  transition: all .2s;
-}
-.tab-btn:hover { opacity: .8; }
-.tab-btn.active { opacity: 1; border-bottom-color: var(--gold); font-weight: 600; }
-.tab-type {
-  display: inline-block;
-  font-size: .7rem;
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-left: 6px;
-  vertical-align: middle;
-  font-weight: 600;
-  letter-spacing: .04em;
-}
-.tab-type.vorbereitung { background: #e3f2fd; color: #1565c0; }
-.tab-type.anlass       { background: #fce4ec; color: #c62828; }
-.tab-type.nachbereitung { background: #e8f5e9; color: #2e7d32; }
+.task-block:hover{filter:brightness(1.1);}
+/* State: frei → Aufgaben-Farbe, normal */
+/* State: andere → Farbe, leicht gedimmt */
+.task-block.andere{opacity:.75;}
+/* State: mine → Farbe + weisser Rahmen */
+.task-block.mine{box-shadow:0 0 0 2px white,0 0 0 4px rgba(0,0,0,.4);}
+/* State: voll → grau */
+.task-block.voll{background:#999 !important;cursor:not-allowed;opacity:.6;}
 
-/* ── TIMELINE ─────────────────────────────────────────────── */
-.day-panel { display: none; padding: 32px 0 60px; }
-.day-panel.active { display: block; }
+.block-time{opacity:.85;font-weight:400;font-size:10px;}
+.block-slots{display:flex;gap:3px;align-items:center;}
+.slot-dot{width:7px;height:7px;border-radius:0;background:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.6);}
+.slot-dot.taken{background:rgba(255,255,255,.9);}
 
-.day-header {
-  display: flex;
-  align-items: baseline;
-  gap: 14px;
-  margin-bottom: 28px;
-}
-.day-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 2rem;
-  font-weight: 700;
-}
-.day-date { font-size: .9rem; opacity: .5; }
+.signup-list{display:flex;flex-wrap:wrap;gap:4px;padding-left:130px;margin-top:-1px;margin-bottom:6px;}
+.signup-pill{font-size:11px;padding:1px 8px;background:var(--bg2);border:1px solid var(--gray-mid);color:var(--text2);}
+.signup-pill.me{background:var(--black);color:white;border-color:var(--black);}
 
-/* Timeline grid */
-.timeline-wrap {
-  position: relative;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-.timeline {
-  position: relative;
-  min-width: 700px;
-}
+/* ── POPUP ───────────────────────────────────────────────── */
+.popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.popup-overlay.open{display:flex;}
+.popup{background:var(--bg);max-width:420px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.25);animation:popIn .18s ease;}
+@keyframes popIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.popup-header{background:var(--black);color:white;padding:16px 20px;}
+.popup-header h3{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+.popup-header .popup-meta{font-size:11px;color:#999;margin-top:3px;}
+.popup-body{padding:20px;}
+.popup-info{background:var(--bg2);border-left:3px solid var(--red);padding:12px 14px;margin-bottom:16px;font-size:13px;}
+.pi-row{display:flex;justify-content:space-between;margin-bottom:3px;}
+.pi-row:last-child{margin-bottom:0;}
+.pi-label{color:var(--text3);}
+.pi-value{font-weight:700;}
+.popup-treffpunkt{background:var(--red-light);border-left:3px solid var(--red);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--red-dark);}
+.popup-treffpunkt strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;}
+.popup-name-display{background:var(--bg2);border:1px solid var(--gray-mid);padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:16px;}
+.popup-name-display small{display:block;font-size:10px;font-weight:400;color:var(--text3);margin-bottom:2px;text-transform:uppercase;letter-spacing:.05em;}
+.popup-full{background:var(--red-light);border:1px solid var(--red);padding:14px 16px;font-size:13px;color:var(--red-dark);font-weight:600;text-align:center;}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+.btn{height:36px;padding:0 18px;border:2px solid var(--black);background:var(--bg);color:var(--black);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit;border-radius:0;}
+.btn:hover{background:var(--black);color:#fff;}
+.btn-red{background:var(--red);color:#fff;border-color:var(--red);}
+.btn-red:hover{background:var(--red-dark);border-color:var(--red-dark);}
+.btn:disabled{opacity:.5;cursor:not-allowed;pointer-events:none;}
 
-/* Hour ruler */
-.hour-ruler {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 0;
-  padding-left: 120px;
-}
-.hour-tick {
-  flex: 1;
-  text-align: left;
-  font-size: .72rem;
-  color: var(--ink);
-  opacity: .35;
-  padding-bottom: 4px;
-  border-left: 1px solid var(--border);
-  padding-left: 3px;
-}
-
-/* Schicht rows */
-.schicht-group { margin-bottom: 24px; }
-.schicht-label {
-  font-size: .75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  opacity: .45;
-  margin-bottom: 6px;
-  padding-left: 4px;
-}
-
-.task-row {
-  display: flex;
-  align-items: center;
-  height: 48px;
-  margin-bottom: 6px;
-  position: relative;
-}
-.task-name {
-  width: 116px;
-  min-width: 116px;
-  font-size: .82rem;
-  font-weight: 500;
-  padding-right: 10px;
-  line-height: 1.2;
-  color: var(--ink);
-  opacity: .75;
-}
-.task-track {
-  flex: 1;
-  height: 44px;
-  background: rgba(26,18,8,.04);
-  border-radius: 8px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--border);
-}
-
-/* The colored block */
-.task-block {
-  position: absolute;
-  top: 4px;
-  height: calc(100% - 8px);
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: .78rem;
-  font-weight: 600;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,.25);
-  transition: filter .15s, transform .1s;
-  user-select: none;
-  overflow: hidden;
-  padding: 0 8px;
-}
-.task-block:hover { filter: brightness(1.12); transform: scaleY(1.04); }
-.task-block.full  { opacity: .55; cursor: not-allowed; }
-.task-block.mine  { box-shadow: 0 0 0 2px white, 0 0 0 4px currentColor; }
-
-.block-time { opacity: .8; font-weight: 400; font-size: .72rem; }
-.block-slots {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-}
-.slot-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.45);
-  border: 1px solid rgba(255,255,255,.7);
-}
-.slot-dot.taken { background: rgba(255,255,255,.9); }
-
-/* Signup popup */
-.popup-overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(26,18,8,.55);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.popup-overlay.open { display: flex; }
-.popup {
-  background: var(--paper);
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 440px;
-  width: 100%;
-  box-shadow: 0 20px 60px rgba(0,0,0,.3);
-  animation: popIn .2s ease;
-}
-@keyframes popIn {
-  from { transform: scale(.92); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
-}
-.popup h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.4rem;
-  margin-bottom: 6px;
-}
-.popup-meta { font-size: .85rem; opacity: .55; margin-bottom: 24px; }
-.popup-info {
-  background: var(--cream);
-  border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 20px;
-  font-size: .88rem;
-}
-.popup-info .pi-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-.popup-info .pi-row:last-child { margin-bottom: 0; }
-.popup-info .pi-label { opacity: .55; }
-.popup-info .pi-value { font-weight: 600; }
-
-.popup label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: 6px; }
-.popup input, .popup textarea {
-  width: 100%;
-  padding: 10px 14px;
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: .93rem;
-  background: white;
-  color: var(--ink);
-  margin-bottom: 16px;
-  transition: border-color .2s;
-}
-.popup input:focus, .popup textarea:focus { outline: none; border-color: var(--gold); }
-.popup textarea { resize: vertical; min-height: 72px; }
-
-.btn-row { display: flex; gap: 10px; justify-content: flex-end; }
-.btn {
-  padding: 10px 22px;
-  border: none;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: .9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .15s;
-}
-.btn-secondary { background: var(--cream); color: var(--ink); }
-.btn-secondary:hover { background: #e8dcc4; }
-.btn-primary {
-  background: var(--gold);
-  color: white;
-}
-.btn-primary:hover { background: #b5820f; }
-.btn-danger { background: var(--red); color: white; }
-.btn-danger:hover { background: #a93226; }
-
-/* Signup list below timeline */
-.signup-list {
-  margin-top: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-.signup-pill {
-  font-size: .72rem;
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: var(--cream);
-  border: 1px solid var(--border);
-  color: var(--ink);
-}
-.signup-pill.me {
-  background: var(--gold);
-  color: white;
-  border-color: var(--gold);
-}
-
-/* Loading */
-.loading {
-  text-align: center;
-  padding: 80px 20px;
-  opacity: .45;
-}
-.loading-spinner {
-  width: 36px; height: 36px;
-  border: 3px solid var(--border);
-  border-top-color: var(--gold);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 16px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Empty state */
-.empty { text-align: center; padding: 60px 20px; opacity: .4; font-size: .95rem; }
-
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: var(--ink);
-  color: var(--paper);
-  padding: 12px 24px;
-  border-radius: 30px;
-  font-size: .88rem;
-  font-weight: 500;
-  z-index: 999;
-  transition: transform .3s ease;
-  pointer-events: none;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-.toast.success { background: var(--green); }
-.toast.error   { background: var(--red); }
-
-/* Responsive */
-@media (max-width: 600px) {
-  .task-name { width: 80px; min-width: 80px; font-size: .75rem; }
-  .hero h1 { font-size: 1.8rem; }
-}
+/* ── MISC ────────────────────────────────────────────────── */
+.loading{text-align:center;padding:3rem;color:var(--text3);}
+.loading svg{display:block;margin:0 auto .75rem;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:3rem;color:var(--text3);font-size:13px;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--black);color:white;padding:10px 22px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;z-index:999;transition:transform .3s ease;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{background:var(--green);}
+.toast.error{background:var(--red);}
+.site-footer{background:var(--black);color:#666;font-size:11px;text-align:center;padding:1rem;}
 </style>
 </head>
 <body>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-inner container">
-    <h1>Chilbi <span>Herrliberg</span></h1>
-    <div class="hero-sub">Schichtplanung &amp; Anmeldung</div>
-    <div style="font-size:.72rem;opacity:.4;margin-top:6px;letter-spacing:.08em">v0.02</div>
-    <div class="hero-dates" id="heroDates"></div>
+<div class="site-header">
+  <div class="site-header-inner">
+    <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
+    <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
+    <div class="header-version">v0.03</div>
   </div>
 </div>
+<div class="red-stripe"></div>
 
 <!-- NAME BAR -->
-<div class="name-bar container">
+<div class="name-bar">
   <label for="myName">Dein Name:</label>
   <input type="text" id="myName" class="name-input" placeholder="Vorname Nachname" autocomplete="name">
-  <span class="name-hint">Gib deinen Namen ein, dann klicke auf eine Schicht zum Eintragen.</span>
+  <span class="name-hint">Name eingeben, dann auf Schicht klicken zum Eintragen.</span>
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> Platz frei</div>
-    <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div> Du eingetragen</div>
-    <div class="legend-item"><div class="legend-dot" style="background:#999"></div> Voll</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#2e7d32"></div>Platz frei</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--black)"></div>Du eingetragen</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e65100"></div>Andere eingetragen</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#999"></div>Voll</div>
   </div>
 </div>
 
 <!-- TABS -->
-<div class="container">
-  <div class="tabs" id="tabBar"></div>
+<div style="background:var(--bg);border-bottom:none;">
+  <div class="container">
+    <div class="tabs" id="tabBar"></div>
+  </div>
 </div>
 
 <!-- CONTENT -->
 <div class="container" id="dayPanels">
   <div class="loading" id="loadingState">
-    <div class="loading-spinner"></div>
-    <div>Lade Schichtplan…</div>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg>
+    Daten werden geladen…
   </div>
 </div>
 
-<!-- SIGNUP POPUP -->
+<!-- POPUP -->
 <div class="popup-overlay" id="popupOverlay">
-  <div class="popup" id="popup">
-    <h3 id="popupTitle">Schicht anmelden</h3>
-    <div class="popup-meta" id="popupMeta"></div>
-    <div class="popup-info" id="popupInfo"></div>
-    <label for="popupName">Dein Name *</label>
-    <input type="text" id="popupName" placeholder="Vorname Nachname" autocomplete="name">
-    <label for="popupEmail">E-Mail (optional)</label>
-    <input type="email" id="popupEmail" placeholder="name@beispiel.ch" autocomplete="email">
-    <label for="popupBemerkung">Bemerkung (optional)</label>
-    <textarea id="popupBemerkung" placeholder="Z.B. kann erst ab 14:00 Uhr…"></textarea>
-    <div class="btn-row">
-      <button class="btn btn-secondary" onclick="closePopup()">Abbrechen</button>
-      <button class="btn btn-danger" id="btnUnsign" style="display:none" onclick="doUnsign()">Abmelden</button>
-      <button class="btn btn-primary" id="btnSign" onclick="doSign()">Eintragen</button>
+  <div class="popup">
+    <div class="popup-header">
+      <h3 id="popupTitle">Schicht eintragen</h3>
+      <div class="popup-meta" id="popupMeta"></div>
+    </div>
+    <div class="popup-body">
+      <div id="popupFull" class="popup-full" style="display:none">
+        Diese Schicht ist schon voll. Es hat aber noch viele andere frei&nbsp;:)
+      </div>
+      <div id="popupNormal">
+        <div class="popup-info" id="popupInfo"></div>
+        <div id="popupTreffpunkt" class="popup-treffpunkt" style="display:none">
+          <strong>Treffpunkt / Info</strong>
+          <span id="popupTreffpunktText"></span>
+        </div>
+        <div class="popup-name-display">
+          <small>Eintragen als</small>
+          <span id="popupNameDisplay">–</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn" onclick="closePopup()">Abbrechen</button>
+          <button class="btn btn-red" id="btnSign" onclick="doSign()">Eintragen</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
+<div class="site-footer">© Chilbi Herrliberg &nbsp;·&nbsp; v0.03</div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8UhuqtmDLOX7hFmyWkk6FhX9uT4E2IFsJs-PjN-hUHmjUXrHeuqJc5bvpZwnT-wRT4w/exec'; // ← nach Deploy ersetzen
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8UhuqtmDLOX7hFmyWkk6FhX9uT4E2IFsJs-PjN-hUHmjUXrHeuqJc5bvpZwnT-wRT4w/exec';
+const PALETTE = ['#c0392b','#1565c0','#2e7d32','#6a1b9a','#00695c','#e65100','#4527a0','#00838f','#558b2f'];
 
-// ── COLORS PER TASK (cycling) ─────────────────────────────────
-const PALETTE = [
-  '#c0392b','#1565c0','#2e7d32','#6a1b9a',
-  '#00695c','#e65100','#4527a0','#00838f','#558b2f'
-];
-
-// ── STATE ─────────────────────────────────────────────────────
-let CONFIG   = [];  // [{Tag, TagLabel, Von, Bis, Schicht, Aufgabe, MaxPersonen, Farbe}]
-let SIGNUPS  = [];  // [{Name, Tag, Schicht, Aufgabe, ...}]
-let DAYS     = [];  // [{id, label, type}]
+let CONFIG  = [];
+let SIGNUPS = [];
+let DAYS    = [];
 let activeDay = 0;
-let currentTarget = null; // {Tag, Schicht, Aufgabe} for popup
+let currentTarget = null;
 
-// ── BOOT ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
+  const saved = localStorage.getItem('chilbi_name');
+  if (saved) document.getElementById('myName').value = saved;
+  document.getElementById('myName').addEventListener('change', e => {
+    localStorage.setItem('chilbi_name', e.target.value.trim());
+  });
+  document.getElementById('popupOverlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('popupOverlay')) closePopup();
+  });
   await loadData();
 });
 
@@ -522,28 +228,23 @@ async function loadData() {
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const text = await r.text();
     let d;
-    try { d = JSON.parse(text); } catch(pe) { throw new Error('Ungültige Antwort vom Server: ' + text.slice(0,120)); }
-    // Normalisiere "Max Personen" → "MaxPersonen" (falls Sheet-Header Leerzeichen hat)
-    CONFIG  = (d.config || []).map(row => {
-      if (row['Max Personen'] !== undefined && row.MaxPersonen === undefined) {
-        row.MaxPersonen = row['Max Personen'];
-      }
+    try { d = JSON.parse(text); } catch(pe) { throw new Error('Ungültige Antwort: ' + text.slice(0,120)); }
+    CONFIG = (d.config || []).map(row => {
+      if (row['Max Personen'] !== undefined && row.MaxPersonen === undefined) row.MaxPersonen = row['Max Personen'];
       return row;
     });
     SIGNUPS = d.signups || [];
     if (el) el.remove();
     buildUI();
   } catch(e) {
-    if (el) el.innerHTML = `<div style="color:var(--red);font-size:.95rem">
+    if (el) el.innerHTML = `<div style="color:var(--red);padding:2rem;text-align:center">
       ⚠ Fehler beim Laden:<br><code style="font-size:.8rem">${e.message}</code><br><br>
-      <button onclick="loadData()" style="padding:8px 18px;background:var(--gold);color:white;border:none;border-radius:8px;cursor:pointer;font-family:inherit">↺ Nochmals versuchen</button>
+      <button class="btn btn-red" onclick="loadData()">↺ Nochmals versuchen</button>
     </div>`;
   }
 }
 
-// ── BUILD UI ──────────────────────────────────────────────────
 function buildUI() {
-  // Days
   const dayMap = {};
   CONFIG.forEach(row => {
     if (!dayMap[row.Tag]) dayMap[row.Tag] = { id: row.Tag, label: row.TagLabel, type: dayType(row.Tag) };
@@ -551,41 +252,26 @@ function buildUI() {
   DAYS = Object.values(dayMap);
 
   if (!DAYS.length) {
-    document.getElementById('dayPanels').innerHTML =
-      '<div class="empty" style="padding:60px 20px">Noch keine Schichten im Admin erfasst.</div>';
+    document.getElementById('dayPanels').innerHTML = '<div class="empty">Noch keine Schichten erfasst.</div>';
     return;
   }
 
-  // Hero dates
-  const heroDates = document.getElementById('heroDates');
-  heroDates.innerHTML = DAYS.map(d => `<div class="hero-date">${d.label}</div>`).join('');
-
-  // Tabs
-  const tabBar = document.getElementById('tabBar');
-  tabBar.innerHTML = DAYS.map((d, i) => `
+  document.getElementById('tabBar').innerHTML = DAYS.map((d, i) => `
     <button class="tab-btn ${i===0?'active':''}" onclick="switchDay(${i})">
-      ${d.label}
+      ${esc(d.label)}
       <span class="tab-type ${d.type}">${typeName(d.type)}</span>
     </button>
   `).join('');
 
-  // Panels
-  const panels = document.getElementById('dayPanels');
-  panels.innerHTML = DAYS.map((d, i) => `
+  document.getElementById('dayPanels').innerHTML = DAYS.map((d, i) => `
     <div class="day-panel ${i===0?'active':''}" id="panel-${i}">
       ${buildTimeline(d.id, d.label)}
     </div>
   `).join('');
 }
 
-function dayType(tagId) {
-  if (tagId.startsWith('V')) return 'vorbereitung';
-  if (tagId.startsWith('N')) return 'nachbereitung';
-  return 'anlass';
-}
-function typeName(t) {
-  return t === 'vorbereitung' ? 'Vorbereitung' : t === 'nachbereitung' ? 'Nachbereitung' : 'Anlass';
-}
+function dayType(id) { return id.startsWith('V') ? 'vorbereitung' : id.startsWith('N') ? 'nachbereitung' : 'anlass'; }
+function typeName(t) { return t==='vorbereitung'?'Vorbereitung':t==='nachbereitung'?'Nachbereitung':'Anlass'; }
 
 function switchDay(i) {
   activeDay = i;
@@ -593,46 +279,47 @@ function switchDay(i) {
   document.querySelectorAll('.day-panel').forEach((p,j) => p.classList.toggle('active', i===j));
 }
 
-// ── TIMELINE ──────────────────────────────────────────────────
 function buildTimeline(tagId, tagLabel) {
   const rows = CONFIG.filter(r => r.Tag === tagId);
   if (!rows.length) return '<div class="empty">Keine Schichten geplant.</div>';
 
-  // Time range
   const allTimes = rows.flatMap(r => { const v = parseTime(r.Von); return [v, parseTime(r.Bis, v)]; });
   const minT = Math.min(...allTimes);
   const maxT = Math.max(...allTimes);
   const spanMin = maxT - minT;
 
-  // Group by Schicht
   const schichtMap = {};
   rows.forEach(r => {
     if (!schichtMap[r.Schicht]) schichtMap[r.Schicht] = [];
     schichtMap[r.Schicht].push(r);
   });
 
-  // Ruler
   const rulerHtml = buildRuler(minT, maxT);
-
-  // Assign color index globally per task key
-  const colorFor = (r) => r.Farbe || PALETTE[(colorIdx(r.Aufgabe)) % PALETTE.length];
+  const colorFor = r => r.Farbe || PALETTE[colorIdx(r.Aufgabe) % PALETTE.length];
 
   const schichtRows = Object.entries(schichtMap).map(([sch, tasks]) => {
     const taskHtml = tasks.map(r => {
-      const vonM     = parseTime(r.Von);
-      const bisM     = parseTime(r.Bis, vonM);
-      const leftPct  = ((vonM - minT) / spanMin * 100).toFixed(2);
-      const widthPct = ((bisM - vonM) / spanMin * 100).toFixed(2);
-      const color    = colorFor(r);
-      const key      = makeKey(tagId, sch, r.Aufgabe);
-      const taken    = signupsFor(tagId, sch, r.Aufgabe);
-      const max      = parseInt(r.MaxPersonen) || 1;
-      const isFull   = taken.length >= max;
-      const isMine   = myName() && taken.some(s => s.Name === myName());
-      const cls      = isFull && !isMine ? 'full' : isMine ? 'mine' : '';
+      const vonM    = parseTime(r.Von);
+      const bisM    = parseTime(r.Bis, vonM);
+      const leftPct = ((vonM - minT) / spanMin * 100).toFixed(2);
+      const widePct = ((bisM - vonM) / spanMin * 100).toFixed(2);
+      const color   = colorFor(r);
+      const taken   = signupsFor(tagId, sch, r.Aufgabe);
+      const max     = parseInt(r.MaxPersonen) || 1;
+      const isFull  = taken.length >= max;
+      const isMine  = myName() && taken.some(s => s.Name === myName());
+      const hasOther= taken.length > 0 && !isMine;
+
+      // 4 Zustände
+      let cls = '';
+      let blockColor = color;
+      if (isMine)        { cls = 'mine'; }
+      else if (isFull)   { cls = 'voll'; blockColor = '#999'; }
+      else if (hasOther) { cls = 'andere'; }
+      // else: frei → standard
 
       const dots = Array.from({length: max}, (_,i) =>
-        `<div class="slot-dot${i < taken.length ? ' taken' : ''}"></div>`
+        `<div class="slot-dot${i < taken.length?' taken':''}"></div>`
       ).join('');
 
       const signupList = taken.map(s =>
@@ -644,36 +331,30 @@ function buildTimeline(tagId, tagLabel) {
           <div class="task-name">${esc(r.Aufgabe)}</div>
           <div class="task-track">
             <div class="task-block ${cls}"
-              style="left:${leftPct}%;width:${widthPct}%;background:${color}"
-              onclick="openPopup('${tagId}','${esc(sch)}','${esc(r.Aufgabe)}','${esc(r.Von)}','${esc(r.Bis)}',${max})"
-              title="${r.Aufgabe} | ${r.Von}–${r.Bis}">
-              <span class="block-time">${r.Von}–${r.Bis}</span>
+              style="left:${leftPct}%;width:${widePct}%;background:${blockColor}"
+              onclick="openPopup('${esc(tagId)}','${esc(sch)}','${esc(r.Aufgabe)}','${esc(r.Von)}','${esc(r.Bis)}',${max},'${esc(r.Informationen||'')}')"
+              title="${esc(r.Aufgabe)} | ${esc(r.Von)}–${esc(r.Bis)}">
+              <span class="block-time">${esc(r.Von)}–${esc(r.Bis)}</span>
               <div class="block-slots">${dots}</div>
             </div>
           </div>
         </div>
-        <div class="signup-list" style="padding-left:120px;margin-top:-2px;margin-bottom:8px">
-          ${signupList}
-        </div>
+        ${taken.length ? `<div class="signup-list">${signupList}</div>` : ''}
       `;
     }).join('');
 
-    return `
-      <div class="schicht-group">
-        <div class="schicht-label">${esc(sch)}</div>
-        ${taskHtml}
-      </div>
-    `;
+    return `<div class="schicht-group">
+      <div class="schicht-label">${esc(sch)}</div>
+      ${taskHtml}
+    </div>`;
   }).join('');
 
   return `
-    <div class="day-header">
-      <div class="day-title">${esc(tagLabel)}</div>
-    </div>
+    <div class="day-header"><div class="day-title">${esc(tagLabel)}</div></div>
     <div class="timeline-wrap">
       <div class="timeline">
         ${rulerHtml}
-        <div style="margin-top:16px">${schichtRows}</div>
+        <div style="margin-top:12px">${schichtRows}</div>
       </div>
     </div>
   `;
@@ -686,44 +367,58 @@ function buildRuler(minT, maxT) {
   let ticks = '';
   for (let h = startH; h <= endH; h++) {
     const pct = ((h * 60 - minT) / spanMin * 100).toFixed(2);
-    ticks += `<div class="hour-tick" style="position:absolute;left:${pct}%">${h}:00</div>`;
+    ticks += `<div class="hour-tick" style="left:calc(130px + (100% - 130px) * ${pct} / 100)">${h < 24 ? h : h-24}:00</div>`;
   }
-  return `
-    <div class="hour-ruler" style="position:relative;height:20px;padding-left:120px;border-bottom:1px solid var(--border)">
-      ${ticks}
-    </div>
-  `;
+  return `<div class="hour-ruler" style="position:relative;height:20px;border-bottom:1px solid var(--gray-mid)">${ticks}</div>`;
 }
 
-// ── POPUP ──────────────────────────────────────────────────────
-function openPopup(tag, schicht, aufgabe, von, bis, max) {
+// ── POPUP ─────────────────────────────────────────────────────
+function openPopup(tag, schicht, aufgabe, von, bis, max, info) {
+  const name = myName();
   currentTarget = { tag, schicht, aufgabe, von, bis, max };
   const taken  = signupsFor(tag, schicht, aufgabe);
   const isFull = taken.length >= max;
-  const isMine = myName() && taken.some(s => s.Name === myName());
 
-  document.getElementById('popupTitle').textContent =
-    isMine ? 'Abmelden' : 'Schicht eintragen';
-  document.getElementById('popupMeta').textContent =
-    `${tag} · ${schicht}`;
+  document.getElementById('popupTitle').textContent = 'Schicht eintragen';
+  document.getElementById('popupMeta').textContent  = `${tag} · ${schicht}`;
+
+  // Voll-Meldung
+  const fullEl   = document.getElementById('popupFull');
+  const normalEl = document.getElementById('popupNormal');
+  if (isFull) {
+    fullEl.style.display   = '';
+    normalEl.style.display = 'none';
+    document.getElementById('popupOverlay').classList.add('open');
+    return;
+  }
+  fullEl.style.display   = 'none';
+  normalEl.style.display = '';
+
   document.getElementById('popupInfo').innerHTML = `
     <div class="pi-row"><span class="pi-label">Aufgabe</span><span class="pi-value">${esc(aufgabe)}</span></div>
-    <div class="pi-row"><span class="pi-label">Zeit</span><span class="pi-value">${von} – ${bis}</span></div>
+    <div class="pi-row"><span class="pi-label">Zeit</span><span class="pi-value">${esc(von)} – ${esc(bis)}</span></div>
     <div class="pi-row"><span class="pi-label">Belegt</span><span class="pi-value">${taken.length} / ${max}</span></div>
     ${taken.length ? `<div class="pi-row"><span class="pi-label">Eingetragen</span><span class="pi-value">${taken.map(s=>esc(s.Name)).join(', ')}</span></div>` : ''}
   `;
 
-  const nameInput = document.getElementById('popupName');
-  nameInput.value = myName();
-
-  document.getElementById('btnSign').style.display   = isMine || isFull ? 'none' : '';
-  document.getElementById('btnUnsign').style.display = isMine ? '' : 'none';
-  if (isFull && !isMine) {
-    document.getElementById('btnSign').disabled = true;
+  // Treffpunkt/Info
+  const treffEl = document.getElementById('popupTreffpunkt');
+  if (info && info.trim()) {
+    treffEl.style.display = '';
+    document.getElementById('popupTreffpunktText').textContent = info;
+  } else {
+    treffEl.style.display = 'none';
   }
 
+  // Name
+  document.getElementById('popupNameDisplay').textContent = name || '(kein Name eingegeben)';
+
+  // Button reset
+  const btn = document.getElementById('btnSign');
+  btn.disabled = false;
+  btn.textContent = 'Eintragen';
+
   document.getElementById('popupOverlay').classList.add('open');
-  if (!isMine) nameInput.focus();
 }
 
 function closePopup() {
@@ -732,55 +427,33 @@ function closePopup() {
 }
 
 async function doSign() {
-  const name = document.getElementById('popupName').value.trim();
-  if (!name) { showToast('Bitte Namen eingeben.', 'error'); return; }
+  const name = myName();
+  if (!name) { showToast('Bitte zuerst Namen eingeben.', 'error'); closePopup(); return; }
 
-  const { tag, schicht, aufgabe, von, bis } = currentTarget;
-  const already = signupsFor(tag, schicht, aufgabe).some(s => s.Name === name);
-  if (already) { showToast('Du bist bereits eingetragen.', 'error'); return; }
+  const { tag, schicht, aufgabe } = currentTarget;
+  if (signupsFor(tag, schicht, aufgabe).some(s => s.Name === name)) {
+    showToast('Du bist bereits eingetragen.', 'error'); closePopup(); return;
+  }
 
-  document.getElementById('myName').value = name;
-  localStorage.setItem('chilbi_name', name);
+  // Sofort ausgrauen
+  const btn = document.getElementById('btnSign');
+  btn.disabled = true;
+  btn.textContent = 'Speichert…';
 
   try {
     const r = await fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({
-        action: 'signup',
-        name,
-        email: document.getElementById('popupEmail').value.trim(),
-        tag,
-        schicht,
-        aufgabe,
-        bemerkung: document.getElementById('popupBemerkung').value.trim()
-      })
+      body: JSON.stringify({ action: 'signup', name, tag, schicht, aufgabe })
     });
     const d = await r.json();
     if (!d.ok) throw new Error(d.error);
     SIGNUPS.push({ Name: name, Tag: tag, Schicht: schicht, Aufgabe: aufgabe });
     closePopup();
-    showToast(`✓ Eingetragen: ${name}`, 'success');
+    showToast('✓ Eingetragen: ' + name, 'success');
     rebuildActivePanel();
   } catch(e) {
-    showToast('Fehler beim Speichern: ' + e.message, 'error');
-  }
-}
-
-async function doUnsign() {
-  const name = myName();
-  const { tag, schicht, aufgabe } = currentTarget;
-  try {
-    const r = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'unsignup', name, tag, schicht, aufgabe })
-    });
-    const d = await r.json();
-    if (!d.ok) throw new Error(d.error);
-    SIGNUPS = SIGNUPS.filter(s => !(s.Name===name && s.Tag===tag && s.Schicht===schicht && s.Aufgabe===aufgabe));
-    closePopup();
-    showToast('Abgemeldet.', 'success');
-    rebuildActivePanel();
-  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Eintragen';
     showToast('Fehler: ' + e.message, 'error');
   }
 }
@@ -794,43 +467,21 @@ function rebuildActivePanel() {
 function parseTime(t, vonMinutes) {
   const [h, m] = String(t).split(':').map(Number);
   let mins = h * 60 + (m || 0);
-  // Wenn Bis < Von → Schicht geht über Mitternacht → +24h
   if (vonMinutes !== undefined && mins <= vonMinutes && mins < 720) mins += 24 * 60;
   return mins;
 }
 function signupsFor(tag, schicht, aufgabe) {
   return SIGNUPS.filter(s => s.Tag===tag && s.Schicht===schicht && s.Aufgabe===aufgabe);
 }
-function makeKey(t,s,a) { return `${t}|${s}|${a}`; }
-function myName() {
-  return document.getElementById('myName')?.value.trim() || localStorage.getItem('chilbi_name') || '';
-}
-let _colorMap = {};
-let _colorCounter = 0;
-function colorIdx(key) {
-  if (_colorMap[key] === undefined) _colorMap[key] = _colorCounter++;
-  return _colorMap[key];
-}
-function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function myName() { return document.getElementById('myName')?.value.trim() || localStorage.getItem('chilbi_name') || ''; }
+let _colorMap={}, _colorCounter=0;
+function colorIdx(key) { if(_colorMap[key]===undefined) _colorMap[key]=_colorCounter++; return _colorMap[key]; }
+function esc(s) { return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function showToast(msg, type='') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (type ? ' ' + type : '');
-  t.classList.add('show');
+  t.textContent = msg; t.className = 'toast'+(type?' '+type:''); t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3200);
 }
-
-// Name persistence
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('chilbi_name');
-  if (saved) document.getElementById('myName').value = saved;
-  document.getElementById('myName').addEventListener('change', e => {
-    localStorage.setItem('chilbi_name', e.target.value.trim());
-  });
-  document.getElementById('popupOverlay').addEventListener('click', e => {
-    if (e.target === document.getElementById('popupOverlay')) closePopup();
-  });
-});
 </script>
 </body>
 </html>
