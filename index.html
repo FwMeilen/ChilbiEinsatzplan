@@ -572,7 +572,9 @@ function buildTimeline(day) {
       const leftPct = ((vonM - minT) / spanMin * 100).toFixed(3);
       const widePct = ((bisM - vonM) / spanMin * 100).toFixed(3);
       const color   = r.Farbe || '#CC0000';
-      const taken   = signupsFor(tagId, sch, r.Aufgabe);
+      // Nutze r.Tag (echte ID wie A7, Sa1) für eindeutige Anmeldungs-Zuordnung
+      const rowId   = r.Tag;
+      const taken   = signupsFor(rowId, sch, r.Aufgabe);
       const max     = parseInt(r.MaxPersonen) || 1;
       const isFull  = taken.length >= max;
       const isMine  = myName() && taken.some(s => s.Name === myName());
@@ -600,7 +602,7 @@ function buildTimeline(day) {
           <div class="task-track">
             <div class="task-block ${cls}"
               style="left:${leftPct}%;width:${widePct}%;background:${blockColor};color:${fgColor}"
-              onclick="openPopup('${esc(tagId)}','${esc(sch)}','${esc(r.Aufgabe)}','${esc(r.Von)}','${esc(r.Bis)}',${max},'${esc(r.Informationen||'')}')"
+              onclick="openPopup('${esc(rowId)}','${esc(sch)}','${esc(r.Aufgabe)}','${esc(r.Von)}','${esc(r.Bis)}',${max},'${esc(r.Informationen||'')}')"
               title="${esc(r.Aufgabe)} | ${esc(r.Von)}–${esc(r.Bis)}">
               <span class="block-time">${esc(r.Von)}–${esc(r.Bis)}</span>
               <div class="block-slots">${dots}</div>
@@ -727,7 +729,8 @@ function parseTime(t, vonMinutes) {
   return mins;
 }
 function signupsFor(tag, schicht, aufgabe) {
-  return SIGNUPS.filter(s => s.Tag===tag && s.Schicht===schicht && s.Aufgabe===aufgabe);
+  // Tag ist die eindeutige ID (A7, Sa1 etc.) - reicht zum Filtern
+  return SIGNUPS.filter(s => String(s.Tag) === String(tag));
 }
 // myName() defined above in boot section
 function esc(s) { return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
