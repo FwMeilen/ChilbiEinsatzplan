@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chilbi Herrliberg – Schichtplan Cl0.011</title>
+<title>Chilbi Herrliberg – Schichtplan Cl0.012</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -224,6 +224,23 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 .name-display{font-size:14px;font-weight:700;color:var(--black);background:white;border:1px solid var(--gray-mid);padding:4px 12px;letter-spacing:.04em;}
 .name-change{font-size:11px;color:var(--red);cursor:pointer;text-decoration:underline;white-space:nowrap;}
 .name-change:hover{color:var(--red-dark);}
+.btn-group{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.btn-refresh{height:30px;padding:0 12px;border:2px solid var(--black);background:var(--bg);color:var(--black);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:inherit;border-radius:0;}
+.btn-refresh:hover{background:var(--black);color:white;}
+.btn-refresh.spinning svg{animation:spin 1s linear infinite;}
+.btn-myshifts{height:30px;padding:0 12px;border:2px solid var(--black);background:var(--black);color:white;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:inherit;border-radius:0;}
+.btn-myshifts:hover,.btn-myshifts.active{background:var(--red);border-color:var(--red);}
+.my-shifts-panel{display:none;padding:1.25rem 1.5rem 4rem;}
+.my-shifts-panel.active{display:block;}
+.my-shifts-empty{text-align:center;padding:3rem;color:var(--text3);font-size:13px;}
+.ms-day-block{margin-bottom:2rem;}
+.ms-day-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);padding-bottom:6px;border-bottom:2px solid var(--black);margin-bottom:10px;}
+.ms-card{background:white;border:1px solid var(--gray-mid);border-left:4px solid var(--red);padding:12px 16px;margin-bottom:8px;cursor:pointer;}
+.ms-card:hover{background:var(--bg2);}
+.ms-card-name{font-size:13px;font-weight:700;margin-bottom:2px;}
+.ms-card-time{font-size:12px;color:var(--text3);}
+.ms-card-schicht{font-size:11px;color:var(--gray);margin-top:2px;}
+.ms-card-treff{font-size:11px;color:var(--red-dark);margin-top:4px;background:var(--red-light);padding:3px 8px;display:inline-block;}
 </style>
 </head>
 <body>
@@ -260,7 +277,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   <div class="site-header-inner">
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
-    <div class="header-version">Cl0.011</div>
+    <div class="header-version">Cl0.012</div>
   </div>
 </div>
 <div class="red-stripe"></div>
@@ -270,15 +287,25 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   <label>Angemeldet als:</label>
   <div class="name-display" id="nameDisplay">–</div>
   <span class="name-change" onclick="splashShow()">(ändern)</span>
+  <div class="btn-group">
+    <button class="btn-myshifts" id="btnMyShifts" onclick="toggleMyShifts()">Meine Schichten</button>
+    <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+      Aktualisieren
+    </button>
+  </div>
 </div>
 
+<!-- MEINE SCHICHTEN PANEL -->
+<div class="my-shifts-panel" id="myShiftsPanel"></div>
+
 <!-- TABS -->
-<div class="tabs-wrap">
+<div class="tabs-wrap" id="tabsWrap">
   <div class="tabs" id="tabBar"></div>
 </div>
 
 <!-- CONTENT -->
-<div id="dayPanels">
+<div id="dayPanels" style="">
   <div class="loading" id="loadingState" style="padding:3rem 1.5rem">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 11-6.22-8.56"/></svg>
     Daten werden geladen…
@@ -317,7 +344,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Chilbi Herrliberg &nbsp;·&nbsp; Cl0.011</div>
+<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Cl0.012</div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9sKAjkwW-0IZlQUD4hTICAhgzoDxaPXXZwGW1euX519Y2TilJUllZpb9PwwPnEnMSHg/exec';
@@ -403,7 +430,116 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (e.target === document.getElementById('popupOverlay')) closePopup();
   });
   await loadData();
+  scheduleRefresh();
 });
+
+const AUTO_REFRESH = 20 * 60 * 1000;
+let refreshTimer = null;
+let myShiftsMode = false;
+
+function scheduleRefresh() {
+  if (refreshTimer) clearTimeout(refreshTimer);
+  refreshTimer = setTimeout(async () => { await silentRefresh(); scheduleRefresh(); }, AUTO_REFRESH);
+}
+
+async function manualRefresh() {
+  const btn = document.getElementById('btnRefresh');
+  btn.classList.add('spinning');
+  await silentRefresh();
+  btn.classList.remove('spinning');
+  scheduleRefresh();
+}
+
+async function silentRefresh() {
+  const savedDay = activeDay;
+  const savedScroll = document.querySelector('.day-panel.active .timeline-wrap')?.scrollLeft || 0;
+  try {
+    const [configRows, signupRows] = await Promise.all([
+      fetchSheet('Konfiguration'), fetchSheet('Anmeldungen')
+    ]);
+    CONFIG = configRows.filter(r => r.ID || r['ID']).map(r => {
+      r.Tag = r.ID || r.Tag || '';
+      r.MaxPersonen = r['Max Personen'] || r.MaxPersonen || '1';
+      r.Informationen = r.Informationen || '';
+      return r;
+    });
+    SIGNUPS = signupRows.filter(r => r.Name && r.Tag).map(r => ({
+      Tag: r.Tag, Name: r.Name, Schicht: r.Schicht, Aufgabe: r.Aufgabe
+    }));
+    buildUI();
+    activeDay = Math.min(savedDay, DAYS.length - 1);
+    document.querySelectorAll('.tab-btn').forEach((b,j) => b.classList.toggle('active', j===activeDay));
+    document.querySelectorAll('.day-panel').forEach((p,j) => p.classList.toggle('active', j===activeDay));
+    rebuildActivePanel();
+    requestAnimationFrame(() => {
+      const tw = document.querySelector('.day-panel.active .timeline-wrap');
+      if (tw) tw.scrollLeft = savedScroll;
+    });
+  } catch(e) { showToast('Fehler beim Laden', 'error'); }
+}
+
+function toggleMyShifts() {
+  myShiftsMode = !myShiftsMode;
+  document.getElementById('btnMyShifts').classList.toggle('active', myShiftsMode);
+  const panel = document.getElementById('myShiftsPanel');
+  const tabsWrap = document.getElementById('tabsWrap');
+  const dayPanels = document.getElementById('dayPanels');
+  if (myShiftsMode) {
+    panel.classList.add('active');
+    tabsWrap.style.display = 'none';
+    dayPanels.style.display = 'none';
+    buildMyShiftsPanel();
+  } else {
+    panel.classList.remove('active');
+    tabsWrap.style.display = '';
+    dayPanels.style.display = '';
+  }
+}
+
+function buildMyShiftsPanel() {
+  const name = myName();
+  const panel = document.getElementById('myShiftsPanel');
+  const mine = SIGNUPS.filter(s => s.Name === name);
+  if (!mine.length) {
+    panel.innerHTML = '<div class="my-shifts-empty">Du bist noch in keiner Schicht eingetragen.</div>';
+    return;
+  }
+  const byDay = {}, dayOrder = [];
+  mine.forEach(s => {
+    const cfg = CONFIG.find(r => r.Tag === s.Tag);
+    if (!cfg) return;
+    const lbl = cfg.TagLabel || cfg.Tag;
+    if (!byDay[lbl]) { byDay[lbl] = []; dayOrder.push(lbl); }
+    byDay[lbl].push({s, cfg});
+  });
+  const seen = new Set();
+  let html = '';
+  dayOrder.filter(d => seen.has(d) ? false : seen.add(d)).forEach(lbl => {
+    html += `<div class="ms-day-block"><div class="ms-day-title">${esc(buildDayHeaderText(lbl))}</div>`;
+    byDay[lbl].forEach(({s, cfg}) => {
+      html += `<div class="ms-card" onclick="openPopup('${esc(cfg.Tag)}','${esc(cfg.Schicht)}','${esc(cfg.Aufgabe)}','${esc(cfg.Von)}','${esc(cfg.Bis)}',${parseInt(cfg.MaxPersonen)||1},'${esc(cfg.Informationen||'')}')">
+        <div class="ms-card-name">${esc(cfg.Aufgabe)}</div>
+        <div class="ms-card-time">${esc(cfg.Von)} – ${esc(cfg.Bis)}</div>
+        <div class="ms-card-schicht">${esc(cfg.Schicht)}</div>
+        ${cfg.Informationen ? `<div class="ms-card-treff">${esc(cfg.Informationen)}</div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+  });
+  panel.innerHTML = html;
+}
+
+function buildDayHeaderText(label) {
+  const WEEKDAYS = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+  const m = label.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})?/);
+  if (m) {
+    const day=parseInt(m[1]), month=parseInt(m[2])-1;
+    const yr=m[3]?(m[3].length===2?2000+parseInt(m[3]):parseInt(m[3])):new Date().getFullYear();
+    const date=new Date(yr,month,day);
+    if (!isNaN(date.getTime())) return WEEKDAYS[date.getDay()]+', '+String(day).padStart(2,'0')+'.'+String(month+1).padStart(2,'0')+'.'+yr;
+  }
+  return label;
+}
 
 const SHEET_ID = '1XqTNfgONmHX9GvmfOVvb94BUo_oQ04Uy7R97FVfdWyo';
 const GVIZ = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
@@ -457,9 +593,6 @@ async function loadData() {
     SIGNUPS = signupRows.filter(r => r.Name && r.Tag).map(r => ({
       Tag: r.Tag, Name: r.Name, Schicht: r.Schicht, Aufgabe: r.Aufgabe
     }));
-    console.log('CONFIG:', CONFIG.length, 'rows, first:', JSON.stringify(CONFIG[0]));
-    console.log('SIGNUPS raw:', signupRows.length, 'rows, first raw:', JSON.stringify(signupRows[0]));
-    console.log('SIGNUPS mapped:', SIGNUPS.length, 'first:', JSON.stringify(SIGNUPS[0]));
     buildUI();
   } catch(e) {
     if (el) el.innerHTML = `<div style="color:var(--red);padding:2rem;text-align:center">
@@ -623,11 +756,13 @@ function buildTimeline(day) {
         </div>
       `;
 
-      // Pills row: only if there are signups
+      // Pills row: positioniert unter dem Block
       if (taken.length) {
         gridRows += `
           <div class="signup-name-cell"></div>
-          <div class="signup-pills-cell">${signupPills}</div>
+          <div class="signup-pills-cell" style="position:relative;">
+            <div style="position:absolute;left:${leftPct}%;display:flex;flex-wrap:wrap;gap:3px;padding-top:2px;">${signupPills}</div>
+          </div>
         `;
       }
     });
