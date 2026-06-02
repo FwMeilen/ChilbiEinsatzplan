@@ -467,7 +467,7 @@ function buildTimeline(day) {
           <div class="task-track">
             <div class="task-block ${cls}"
               style="left:${leftPct}%;width:${widePct}%;background:${blockColor};color:${fgColor}"
-              onclick="openPopup(${JSON.stringify(r.Tag)},${JSON.stringify(r.Schicht)},${JSON.stringify(r.Aufgabe)},${JSON.stringify(r.Von)},${JSON.stringify(r.Bis)},${max},${JSON.stringify(r.Informationen||'')})"
+              onclick="openPopupByTag('${esc(r.Tag)}')"
               title="${esc(r.Aufgabe)} | ${esc(r.Von)}–${esc(r.Bis)}">
               <span class="block-time">${esc(r.Von)}–${esc(r.Bis)}</span>
               <div class="block-slots">${dots}</div>
@@ -494,6 +494,12 @@ function buildTimeline(day) {
 }
 
 // ── POPUP ─────────────────────────────────────────────────────
+function openPopupByTag(tagId) {
+  const r = CONFIG.find(row => String(row.Tag) === String(tagId));
+  if (!r) return;
+  openPopup(tagId, r.Schicht, r.Aufgabe, r.Von, r.Bis, parseInt(r.MaxPersonen)||1, r.Informationen||'');
+}
+
 function openPopup(tagId, schicht, aufgabe, von, bis, max, info) {
   const name   = myName();
   currentTarget = { tagId, schicht, aufgabe, von, bis, max };
