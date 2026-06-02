@@ -339,6 +339,8 @@ async function loadData() {
       Timestamp: r.Timestamp
     }));
     if (el) el.remove();
+    console.log('CONFIG loaded:', CONFIG.length, 'rows');
+    console.log('First row:', JSON.stringify(CONFIG[0]));
     buildUI();
   } catch(e) {
     if (el) el.innerHTML = `<div style="color:var(--red);padding:2rem;text-align:center">
@@ -357,7 +359,7 @@ function buildUI() {
   DAYS = Object.values(dayMap);
 
   if (!DAYS.length) {
-    document.getElementById('dayPanels').innerHTML = '<div class="empty">Noch keine Schichten erfasst.</div>';
+    document.getElementById('dayPanels').innerHTML = `<div class="empty">Noch keine Schichten erfasst. (CONFIG: ${CONFIG.length} Zeilen geladen)</div>`;
     return;
   }
 
