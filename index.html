@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chilbi Herrliberg – Schichtplan v0.09</title>
+<title>Chilbi Herrliberg – Schichtplan v0.10</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -101,20 +101,30 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 .day-title{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text3);}
 
 /* ── TIMELINE ────────────────────────────────────────────── */
-.timeline-wrap{overflow-x:auto;overflow-y:visible;padding-bottom:8px;}
-.timeline{display:grid;grid-template-columns:130px 1fr;overflow:visible;}
-.timeline-track-area{position:relative;}
-.ruler-row{grid-column:1/-1;display:grid;grid-template-columns:130px 1fr;position:sticky;top:0;z-index:10;background:var(--bg3);border-bottom:1px solid var(--gray-mid);}
-.ruler-spacer{background:var(--bg3);}
-.ruler-ticks{position:relative;height:24px;overflow:visible;}
-.hour-tick{position:absolute;font-size:10px;color:var(--text3);border-left:1px solid var(--gray-mid);padding-left:3px;top:5px;white-space:nowrap;}
-.schicht-header-row{grid-column:1/-1;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--gray);padding:8px 0 4px;border-bottom:1px solid var(--gray-mid);}
-.task-name-cell{position:sticky;left:0;z-index:5;background:var(--bg3);display:flex;align-items:center;font-size:12px;font-weight:600;color:var(--text2);padding-right:10px;min-height:44px;}
-.task-track-cell{position:relative;height:44px;display:flex;align-items:center;overflow:visible;}
-.task-track{position:relative;width:100%;height:36px;background:rgba(0,0,0,.04);border:1px solid var(--gray-mid);overflow:visible;pointer-events:none;}
-.signup-name-cell{position:sticky;left:0;z-index:5;background:var(--bg3);}
-.signup-pills-cell{padding:2px 0 8px;position:relative;min-height:24px;}
-.signup-pill{font-size:11px;padding:1px 8px;background:var(--bg2);border:1px solid var(--gray-mid);color:var(--text2);display:inline-block;margin-right:3px;margin-bottom:2px;}
+.timeline-wrap{overflow-x:auto;padding-bottom:16px;}
+/* Jede Zeile = flex: label (sticky) + track */
+.tl-row{display:flex;align-items:stretch;min-height:44px;border-bottom:1px solid rgba(0,0,0,.04);}
+.tl-label{flex:0 0 130px;width:130px;min-width:130px;position:sticky;left:0;z-index:5;
+  background:var(--bg3);display:flex;align-items:center;
+  font-size:12px;font-weight:600;color:var(--text2);padding-right:10px;padding-top:4px;padding-bottom:4px;}
+.tl-track{flex:0 0 auto;position:relative;height:36px;margin:4px 0;
+  background:rgba(0,0,0,.04);border:1px solid var(--gray-mid);}
+.tl-pills{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:3px;align-items:flex-start;
+  padding:2px 0 6px;position:relative;}
+.tl-schicht{display:flex;align-items:center;min-height:28px;}
+.tl-schicht-label{flex:0 0 130px;width:130px;min-width:130px;position:sticky;left:0;z-index:5;
+  background:var(--bg3);font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.1em;color:var(--gray);padding-right:10px;}
+.tl-schicht-line{flex:0 0 auto;border-bottom:1px solid var(--gray-mid);align-self:flex-end;margin-bottom:4px;}
+/* Ruler */
+.tl-ruler{display:flex;align-items:stretch;border-bottom:1px solid var(--gray-mid);
+  position:sticky;top:0;z-index:10;background:var(--bg3);}
+.tl-ruler-spacer{flex:0 0 130px;width:130px;min-width:130px;position:sticky;left:0;z-index:6;background:var(--bg3);}
+.tl-ruler-ticks{flex:0 0 auto;position:relative;height:22px;}
+.hour-tick{position:absolute;font-size:10px;color:var(--text3);border-left:1px solid var(--gray-mid);
+  padding-left:3px;top:4px;white-space:nowrap;}
+.signup-pill{font-size:11px;padding:1px 8px;background:var(--bg2);border:1px solid var(--gray-mid);
+  color:var(--text2);display:inline-block;}
 .signup-pill.me{background:var(--black);color:white;border-color:var(--black);}
 
 /* ── BLOCK STATES ────────────────────────────────────────── */
@@ -123,7 +133,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   cursor:pointer;display:flex;align-items:center;gap:6px;
   font-size:11px;font-weight:700;
   transition:filter .15s;user-select:none;overflow:hidden;padding:0 8px;
-  pointer-events:all;z-index:2;
+  pointer-events:auto;z-index:2;
 }
 .task-block:hover{filter:brightness(1.08);}
 .task-block.andere::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(0,0,0,.15) 0px,rgba(0,0,0,.15) 3px,transparent 3px,transparent 8px);pointer-events:none;}
@@ -220,7 +230,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   <div class="site-header-inner">
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
-    <div class="header-version">v0.09</div>
+    <div class="header-version">v0.10</div>
   </div>
 </div>
 <div class="red-stripe"></div>
@@ -293,7 +303,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; v0.09</div>
+<div class="site-footer">© Stützpunktfeuerwehr Meilen &nbsp;·&nbsp; v0.10</div>
 
 <script>
 const SCRIPT_URL     = 'https://script.google.com/macros/s/AKfycbz8UhuqtmDLOX7hFmyWkk6FhX9uT4E2IFsJs-PjN-hUHmjUXrHeuqJc5bvpZwnT-wRT4w/exec';
@@ -601,7 +611,7 @@ function textColor(hex) {
   return (0.299*r+0.587*g+0.114*b)/255>0.55?'#1a1a1a':'#ffffff';
 }
 
-const PX_PER_MIN = 4; // 4px pro Minute → 1h = 240px
+const PX_PER_MIN = 2; // 2px pro Minute → 1h = 120px
 
 function buildTimeline(day) {
   const rows = day.rows;
@@ -611,27 +621,39 @@ function buildTimeline(day) {
   const minT=Math.min(...allTimes), maxT=Math.max(...allTimes);
   const totalPx = (maxT - minT) * PX_PER_MIN;
 
-  // Ruler ticks
+  // Ruler
   const startH=Math.floor(minT/60), endH=Math.ceil(maxT/60);
   let ticks='';
   for(let h=startH;h<=endH;h++){
-    const px=((h*60-minT)*PX_PER_MIN);
+    const px=(h*60-minT)*PX_PER_MIN;
     ticks+=`<div class="hour-tick" style="left:${px}px">${h%24}:00</div>`;
   }
 
+  // Group by Schicht
   const schichtMap={}, schichtOrder=[];
   rows.forEach(r=>{
     if(!schichtMap[r.Schicht]){schichtMap[r.Schicht]=[];schichtOrder.push(r.Schicht);}
     schichtMap[r.Schicht].push(r);
   });
 
-  let gridRows='';
+  let html='';
+  // Ruler row
+  html+=`<div class="tl-ruler">
+    <div class="tl-ruler-spacer"></div>
+    <div class="tl-ruler-ticks" style="width:${totalPx}px">${ticks}</div>
+  </div>`;
+
   schichtOrder.forEach(sch=>{
-    gridRows+=`<div class="schicht-header-row">${esc(sch)}</div>`;
+    // Schicht header
+    html+=`<div class="tl-schicht">
+      <div class="tl-schicht-label">${esc(sch)}</div>
+      <div class="tl-schicht-line" style="width:${totalPx}px"></div>
+    </div>`;
+
     schichtMap[sch].forEach(r=>{
       const vonM=parseTime(r.Von), bisM=parseTime(r.Bis,vonM);
-      const leftPx=((vonM-minT)*PX_PER_MIN);
-      const widePx=((bisM-vonM)*PX_PER_MIN);
+      const leftPx=(vonM-minT)*PX_PER_MIN;
+      const widePx=(bisM-vonM)*PX_PER_MIN;
       const color=r.Farbe||'#CC0000';
       const taken=SIGNUPS.filter(s=>s.Tag===r.Tag);
       const max=parseInt(r.MaxPersonen)||1;
@@ -648,41 +670,37 @@ function buildTimeline(day) {
       const dots=Array.from({length:max},(_,i)=>`<div class="slot-dot${i<taken.length?' taken':''}"></div>`).join('');
       const signupPills=taken.map(s=>`<span class="signup-pill${s.Name===myName()?' me':''}">${esc(s.Name)}</span>`).join('');
 
-      const pillsHtml=taken.length?`
-        <div class="signup-name-cell" data-tagid="${esc(r.Tag)}"></div>
-        <div class="signup-pills-cell" data-tagid="${esc(r.Tag)}">
-          <div style="position:absolute;left:${leftPx}px;display:flex;flex-wrap:wrap;gap:3px;padding-top:1px;">${signupPills}</div>
-        </div>`:'';
-
-      gridRows+=`
-        <div class="task-name-cell" data-tagid="${esc(r.Tag)}">${esc(r.Aufgabe)}</div>
-        <div class="task-track-cell" data-tagid="${esc(r.Tag)}" style="width:${totalPx}px;min-width:${totalPx}px;">
-          <div class="task-track" style="width:${totalPx}px;">
-            <div class="task-block ${cls}"
-              style="left:${leftPx}px;width:${widePx}px;background:${blockColor};color:${fgColor}"
-              onclick="openPopupByTag('${esc(r.Tag)}')"
-              title="${esc(r.Aufgabe)} | ${esc(r.Von)}–${esc(r.Bis)}">
-              <span class="block-time">${esc(r.Von)}–${esc(r.Bis)}</span>
-              <div class="block-slots">${dots}</div>
-            </div>
+      // Task row
+      html+=`<div class="tl-row" data-tagid="${esc(r.Tag)}">
+        <div class="tl-label">${esc(r.Aufgabe)}</div>
+        <div class="tl-track" style="width:${totalPx}px">
+          <div class="task-block ${cls}"
+            style="left:${leftPx}px;width:${widePx}px;background:${blockColor};color:${fgColor}"
+            onclick="openPopupByTag('${esc(r.Tag)}')"
+            title="${esc(r.Aufgabe)} | ${esc(r.Von)}–${esc(r.Bis)}">
+            <span class="block-time">${esc(r.Von)}–${esc(r.Bis)}</span>
+            <div class="block-slots">${dots}</div>
           </div>
         </div>
-        ${pillsHtml}`;
+      </div>`;
+
+      // Pills row
+      if(taken.length){
+        html+=`<div class="tl-row" data-tagid="${esc(r.Tag)}">
+          <div class="tl-label"></div>
+          <div class="tl-pills" style="width:${totalPx}px;padding-left:${leftPx}px">${signupPills}</div>
+        </div>`;
+      }
     });
   });
 
   return `
     <div class="day-header">${buildDayHeader(day.label)}</div>
     <div class="timeline-wrap">
-      <div class="timeline">
-        <div class="ruler-row">
-          <div class="ruler-spacer"></div>
-          <div class="ruler-ticks" style="width:${totalPx}px;min-width:${totalPx}px;">${ticks}</div>
-        </div>
-        ${gridRows}
-      </div>
+      <div style="display:inline-block;min-width:100%">${html}</div>
     </div>`;
 }
+
 
 // ── POPUP ─────────────────────────────────────────────────────
 function openPopupByTag(tagId) {
