@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chilbi Herrliberg – Schichtplan v0.13</title>
+<title>Chilbi Herrliberg – Schichtplan v0.05</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -33,9 +33,6 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 .name-input{height:32px;padding:0 10px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;background:white;color:var(--text);min-width:160px;max-width:220px;border-radius:0;}
 .name-input:focus{outline:none;border-color:var(--black);}
 .name-hint{font-size:11px;color:var(--text3);}
-.btn-refresh{height:30px;padding:0 12px;border:2px solid var(--black);background:var(--bg);color:var(--black);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-family:inherit;border-radius:0;margin-left:auto;}
-.btn-refresh:hover{background:var(--black);color:white;}
-.btn-refresh.spinning svg{animation:spin 1s linear infinite;}
 .legend{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
 .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
 .legend-dot{width:10px;height:10px;}
@@ -207,7 +204,7 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   <div class="site-header-inner">
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Schichtplanung &amp; Anmeldung</span></div>
-    <div class="header-version">v0.13</div>
+    <div class="header-version">v0.05</div>
   </div>
 </div>
 <div class="red-stripe"></div>
@@ -217,10 +214,12 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
   <label for="myName">Dein Name oder Kürzel:</label>
   <input type="text" id="myName" class="name-input" autocomplete="name">
   <span class="name-hint">Name eingeben, dann auf Schicht klicken zum Eintragen.</span>
-  <button class="btn-refresh" id="btnRefresh" onclick="manualRefresh()">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-    Aktualisieren
-  </button>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Platz frei</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--black)"></div>Du eingetragen</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--red);opacity:.45"></div>Andere eingetragen</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#aaa"></div>Voll</div>
+  </div>
 </div>
 
 <!-- TABS -->
@@ -268,10 +267,10 @@ body{font-family:'Open Sans',Arial,sans-serif;background:var(--bg3);color:var(--
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; v0.13</div>
+<div class="site-footer">© Chilbi Herrliberg &nbsp;·&nbsp; v0.05</div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-faJtLQp0cmTxkthRbq-qo0dijo2qJ525UsR-orqA_Awu9pVi_KWaqTn0YMjYdsmsYw/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8UhuqtmDLOX7hFmyWkk6FhX9uT4E2IFsJs-PjN-hUHmjUXrHeuqJc5bvpZwnT-wRT4w/exec';
 
 let CONFIG  = [];
 let SIGNUPS = [];
@@ -289,14 +288,6 @@ function textColor(hex) {
   return lum > 0.55 ? '#1a1a1a' : '#ffffff';
 }
 
-const AUTO_REFRESH = 20 * 60 * 1000;
-let refreshTimer = null;
-
-function normalizeRow(row) {
-  if (row['Max Personen'] !== undefined && row.MaxPersonen === undefined) row.MaxPersonen = row['Max Personen'];
-  return row;
-}
-
 window.addEventListener('DOMContentLoaded', async () => {
   const saved = localStorage.getItem('chilbi_name');
   if (saved) document.getElementById('myName').value = saved;
@@ -307,41 +298,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (e.target === document.getElementById('popupOverlay')) closePopup();
   });
   await loadData();
-  scheduleRefresh();
 });
-
-function scheduleRefresh() {
-  if (refreshTimer) clearTimeout(refreshTimer);
-  refreshTimer = setTimeout(async () => { await silentRefresh(); scheduleRefresh(); }, AUTO_REFRESH);
-}
-
-async function manualRefresh() {
-  const btn = document.getElementById('btnRefresh');
-  btn.classList.add('spinning');
-  await silentRefresh();
-  btn.classList.remove('spinning');
-  scheduleRefresh();
-}
-
-async function silentRefresh() {
-  const savedDay = activeDay;
-  const savedScroll = document.querySelector('.day-panel.active .timeline-wrap')?.scrollLeft || 0;
-  try {
-    const r = await fetch(SCRIPT_URL + '?action=all&_=' + Date.now());
-    const d = JSON.parse(await r.text());
-    CONFIG  = (d.config  || []).map(normalizeRow);
-    SIGNUPS = d.signups || [];
-    buildUI();
-    activeDay = Math.min(savedDay, DAYS.length - 1);
-    document.querySelectorAll('.tab-btn').forEach((b,j) => b.classList.toggle('active', j===activeDay));
-    document.querySelectorAll('.day-panel').forEach((p,j) => p.classList.toggle('active', j===activeDay));
-    rebuildActivePanel();
-    requestAnimationFrame(() => {
-      const tw = document.querySelector('.day-panel.active .timeline-wrap');
-      if (tw) tw.scrollLeft = savedScroll;
-    });
-  } catch(e) { showToast('Fehler beim Laden', 'error'); }
-}
 
 async function loadData() {
   const el = document.getElementById('loadingState');
@@ -368,19 +325,11 @@ async function loadData() {
 
 // ── BUILD UI ──────────────────────────────────────────────────
 function buildUI() {
-  const el = document.getElementById('loadingState');
-  if (el) el.remove();
-  // Groepiere nach TagLabel – ein Tab pro Datum
-  const labelMap = {}, labelOrder = [];
+  const dayMap = {};
   CONFIG.forEach(row => {
-    const lbl = row.TagLabel || row.Tag;
-    if (!labelMap[lbl]) {
-      labelMap[lbl] = { id: lbl, label: lbl, type: dayType(row.Tag), rows: [] };
-      labelOrder.push(lbl);
-    }
-    labelMap[lbl].rows.push(row);
+    if (!dayMap[row.Tag]) dayMap[row.Tag] = { id: row.Tag, label: row.TagLabel, type: dayType(row.Tag) };
   });
-  DAYS = labelOrder.map(lbl => labelMap[lbl]);
+  DAYS = Object.values(dayMap);
 
   if (!DAYS.length) {
     document.getElementById('dayPanels').innerHTML = '<div class="empty">Noch keine Schichten erfasst.</div>';
@@ -396,7 +345,7 @@ function buildUI() {
 
   document.getElementById('dayPanels').innerHTML = DAYS.map((d, i) => `
     <div class="day-panel ${i===0?'active':''}" id="panel-${i}">
-      ${buildTimeline(d)}
+      ${buildTimeline(d.id, d.label)}
     </div>
   `).join('');
 }
@@ -445,9 +394,8 @@ function switchDay(i) {
 }
 
 // ── TIMELINE ─────────────────────────────────────────────────
-function buildTimeline(day) {
-  const tagId = day.id; const tagLabel = day.label;
-  const rows = day.rows || [];
+function buildTimeline(tagId, tagLabel) {
+  const rows = CONFIG.filter(r => r.Tag === tagId);
   if (!rows.length) return '<div class="empty">Keine Schichten geplant.</div>';
 
   const allTimes = rows.flatMap(r => { const v = parseTime(r.Von); return [v, parseTime(r.Bis, v)]; });
@@ -509,7 +457,7 @@ function buildTimeline(day) {
           <div class="task-track">
             <div class="task-block ${cls}"
               style="left:${leftPct}%;width:${widePct}%;background:${blockColor};color:${fgColor}"
-              onclick="openPopupByTag('${esc(r.Tag)}')"
+              onclick="openPopup('${esc(tagId)}','${esc(sch)}','${esc(r.Aufgabe)}','${esc(r.Von)}','${esc(r.Bis)}',${max},'${esc(r.Informationen||'')}')"
               title="${esc(r.Aufgabe)} | ${esc(r.Von)}–${esc(r.Bis)}">
               <span class="block-time">${esc(r.Von)}–${esc(r.Bis)}</span>
               <div class="block-slots">${dots}</div>
@@ -543,12 +491,6 @@ function buildTimeline(day) {
 }
 
 // ── POPUP ─────────────────────────────────────────────────────
-function openPopupByTag(tagId) {
-  const r = CONFIG.find(row => String(row.Tag) === String(tagId));
-  if (!r) return;
-  openPopup(tagId, r.Schicht, r.Aufgabe, r.Von, r.Bis, parseInt(r.MaxPersonen)||1, r.Informationen||'');
-}
-
 function openPopup(tag, schicht, aufgabe, von, bis, max, info) {
   const name = myName();
   currentTarget = { tag, schicht, aufgabe, von, bis, max };
@@ -631,7 +573,7 @@ async function doSign() {
 
 function rebuildActivePanel() {
   const d = DAYS[activeDay];
-  if (d) document.getElementById(`panel-${activeDay}`).innerHTML = buildTimeline(d);
+  document.getElementById(`panel-${activeDay}`).innerHTML = buildTimeline(d.id, d.label);
 }
 
 // ── HELPERS ───────────────────────────────────────────────────
@@ -642,7 +584,7 @@ function parseTime(t, vonMinutes) {
   return mins;
 }
 function signupsFor(tag, schicht, aufgabe) {
-  return SIGNUPS.filter(s => s.Tag===tag); // Tag is unieke ID
+  return SIGNUPS.filter(s => s.Tag===tag && s.Schicht===schicht && s.Aufgabe===aufgabe);
 }
 function myName() { return document.getElementById('myName')?.value.trim() || localStorage.getItem('chilbi_name') || ''; }
 function esc(s) { return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
