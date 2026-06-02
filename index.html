@@ -304,7 +304,6 @@ async function loadData() {
   const el = document.getElementById('loadingState');
   try {
     const r = await fetch(`${SCRIPT_URL}?action=all&_=${Date.now()}`);
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
     const text = await r.text();
     let d;
     try { d = JSON.parse(text); } catch(pe) { throw new Error('Ungültige Antwort: ' + text.slice(0,120)); }
