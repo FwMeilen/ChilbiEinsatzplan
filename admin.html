@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chilbi Admin – Schichtverwaltung Cl0.017</title>
+<title>Chilbi Admin – Schichtverwaltung Cl0.018</title>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -156,9 +156,9 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl0.017</span>
-      <button class="btn btn-sm" onclick="window.open('index.html','_blank')">→ Signup-Seite</button>
-      <button class="btn btn-sm" onclick="loadData()">↺ Aktualisieren</button>
+      <span class="header-version">Cl0.018</span>
+      <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
+      <button class="btn btn-sm btn-red" onclick="loadData()">↺ Aktualisieren</button>
     </div>
   </div>
 </div>
@@ -211,7 +211,14 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Tag</th><th>ID</th><th>Schicht</th><th>Aufgabe</th><th>Name</th><th>Timestamp</th></tr></thead>
+          <thead><tr>
+  <th onclick="sortSignups('TagLabel')" style="cursor:pointer">Tag ↕</th>
+  <th onclick="sortSignups('Tag')" style="cursor:pointer">ID ↕</th>
+  <th onclick="sortSignups('Schicht')" style="cursor:pointer">Schicht ↕</th>
+  <th onclick="sortSignups('Aufgabe')" style="cursor:pointer">Aufgabe ↕</th>
+  <th onclick="sortSignups('Name')" style="cursor:pointer">Name ↕</th>
+  <th>Timestamp</th><th></th>
+</tr></thead>
           <tbody id="signupBody"></tbody>
         </table>
       </div>
@@ -220,17 +227,52 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
 
   <!-- ÜBERSICHT -->
   <div class="admin-section" id="sec-uebersicht">
+    <div class="card" style="border-top-color:var(--black)">
+      <div class="card-title">Tage drucken</div>
+      <div id="printBtns" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
     <div class="card">
-      <div class="card-title">Belegungsübersicht
-        <span style="margin-left:auto;display:flex;gap:6px;" id="printBtns"></span>
-      </div>
+      <div class="card-title">Belegungsübersicht</div>
       <div id="overviewContent"></div>
     </div>
   </div>
 </div>
 
+
+<!-- EDIT SIGNUP POPUP -->
+<div id="editPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;max-width:440px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.25);">
+    <div style="background:var(--black);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;">Eintrag bearbeiten</div>
+    <div style="padding:20px;">
+      <table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <tr><td style="padding:6px 0;font-weight:600;width:80px">Tag (ID)</td><td><input id="editTag" style="width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;"></td></tr>
+        <tr><td style="padding:6px 0;font-weight:600">Name</td><td><input id="editName" style="width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;"></td></tr>
+        <tr><td style="padding:6px 0;font-weight:600">Schicht</td><td><input id="editSchicht" style="width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;"></td></tr>
+        <tr><td style="padding:6px 0;font-weight:600">Aufgabe</td><td><input id="editAufgabe" style="width:100%;height:32px;padding:0 8px;border:1px solid var(--gray-mid);font-family:inherit;font-size:13px;"></td></tr>
+      </table>
+      <div style="display:flex;gap:8px;justify-content:space-between;margin-top:20px;">
+        <button class="btn btn-red btn-sm" onclick="confirmDeleteSignup()" style="margin-right:auto">&#128465; Löschen</button>
+        <button class="btn btn-sm" onclick="closeEditPopup()">Abbrechen</button>
+        <button class="btn btn-green btn-sm" onclick="saveEditSignup()">&#128190; Speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- CONFIRM DELETE POPUP -->
+<div id="confirmPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:white;max-width:380px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.3);">
+    <div style="background:var(--red);color:white;padding:16px 20px;font-size:14px;font-weight:700;text-transform:uppercase;">⚠ Wirklich löschen?</div>
+    <div style="padding:20px;">
+      <p style="font-size:13px;margin-bottom:16px;line-height:1.5;color:var(--text2)">Willst du diesen Eintrag wirklich löschen?<br><strong style="color:var(--red)">Daten können nicht mehr wiederhergestellt werden.</strong></p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn btn-sm" onclick="closeConfirmPopup()">Abbrechen</button>
+        <button class="btn btn-red btn-sm" onclick="doDeleteSignup()">Definitiv löschen</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl0.017</div>
+<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl0.018</div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9sKAjkwW-0IZlQUD4hTICAhgzoDxaPXXZwGW1euX519Y2TilJUllZpb9PwwPnEnMSHg/exec';
@@ -383,19 +425,9 @@ function renderSignups() {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3)">Keine Einträge</td></tr>`;
     return;
   }
-  // Sortierung: TagLabel → ID → Schicht → Aufgabe → Name
-  filtered.sort((a,b) => {
-    const cfgA = CONFIG.find(r=>r.Tag===a.Tag)||{};
-    const cfgB = CONFIG.find(r=>r.Tag===b.Tag)||{};
-    const lblA = cfgA.TagLabel||a.Tag||'';
-    const lblB = cfgB.TagLabel||b.Tag||'';
-    if (lblA !== lblB) return lblA.localeCompare(lblB,'de');
-    if (a.Tag !== b.Tag) return String(a.Tag).localeCompare(String(b.Tag),'de',{numeric:true});
-    if (a.Schicht !== b.Schicht) return String(a.Schicht||'').localeCompare(String(b.Schicht||''),'de');
-    if (a.Aufgabe !== b.Aufgabe) return String(a.Aufgabe||'').localeCompare(String(b.Aufgabe||''),'de');
-    return String(a.Name||'').localeCompare(String(b.Name||''),'de');
-  });
-  tbody.innerHTML = filtered.map(s => {
+  sortSignupsData(filtered);
+  filteredSignups = filtered;
+  tbody.innerHTML = filtered.map((s,idx) => {
     const cfg = CONFIG.find(r=>r.Tag===s.Tag)||{};
     return `<tr>
       <td>${esc(cfg.TagLabel||s.Tag)}</td>
@@ -404,8 +436,23 @@ function renderSignups() {
       <td>${esc(s.Aufgabe)}</td>
       <td style="font-weight:600">${esc(s.Name)}</td>
       <td style="color:var(--text3);font-size:11px">${esc(formatDate(s.Timestamp))}</td>
+      <td><button onclick="openEditPopup(${idx})" style="border:none;background:none;cursor:pointer;font-size:14px;opacity:.6;padding:2px 6px;" title="Bearbeiten">&#9998;</button></td>
     </tr>`;
   }).join('');
+}
+
+let sortCol='TagLabel', sortAsc=true, filteredSignups=[];
+function sortSignups(col){if(sortCol===col)sortAsc=!sortAsc;else{sortCol=col;sortAsc=true;}renderSignups();}
+function sortSignupsData(arr){
+  arr.sort((a,b)=>{
+    const cfgA=CONFIG.find(r=>r.Tag===a.Tag)||{};
+    const cfgB=CONFIG.find(r=>r.Tag===b.Tag)||{};
+    let vA,vB;
+    if(sortCol==='TagLabel'){vA=cfgA.TagLabel||a.Tag||'';vB=cfgB.TagLabel||b.Tag||'';}
+    else{vA=String(a[sortCol]||'');vB=String(b[sortCol]||'');}
+    const c=vA.localeCompare(vB,'de',{numeric:true});
+    return sortAsc?c:-c;
+  });
 }
 
 function renderStats() {
@@ -574,6 +621,38 @@ function hexToRgb(hex) {
 document.addEventListener('click', e => {
   if (!e.target.closest('.color-picker-wrap')) closeAllColorPickers();
 });
+
+
+let editIdx=null, editOriginal=null;
+function openEditPopup(idx){
+  editIdx=idx; editOriginal={...filteredSignups[idx]};
+  const s=filteredSignups[idx];
+  document.getElementById('editTag').value=s.Tag||'';
+  document.getElementById('editName').value=s.Name||'';
+  document.getElementById('editSchicht').value=s.Schicht||'';
+  document.getElementById('editAufgabe').value=s.Aufgabe||'';
+  document.getElementById('editPopupOverlay').style.display='flex';
+}
+function closeEditPopup(){document.getElementById('editPopupOverlay').style.display='none';editIdx=null;editOriginal=null;}
+async function saveEditSignup(){
+  const updated={action:'editSignup',tag:document.getElementById('editTag').value.trim(),name:document.getElementById('editName').value.trim(),schicht:document.getElementById('editSchicht').value.trim(),aufgabe:document.getElementById('editAufgabe').value.trim(),oldTag:editOriginal.Tag,oldName:editOriginal.Name};
+  try{
+    const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(updated)});
+    const d=await r.json();
+    if(!d.ok)throw new Error(d.error);
+    closeEditPopup();showToast('Gespeichert','success');await loadData();
+  }catch(e){showToast('Fehler: '+e.message,'error');}
+}
+function confirmDeleteSignup(){document.getElementById('confirmPopupOverlay').style.display='flex';}
+function closeConfirmPopup(){document.getElementById('confirmPopupOverlay').style.display='none';}
+async function doDeleteSignup(){
+  try{
+    const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({action:'unsignup',tag:editOriginal.Tag,name:editOriginal.Name})});
+    const d=await r.json();
+    if(!d.ok)throw new Error(d.error);
+    closeConfirmPopup();closeEditPopup();showToast('Gelöscht','success');await loadData();
+  }catch(e){showToast('Fehler: '+e.message,'error');}
+}
 
 function formatDate(d) { try{return new Date(d).toLocaleString('de-CH');}catch(e){return d||'';} }
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
