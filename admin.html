@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chilbi Admin – Schichtverwaltung Cl0.021</title>
+<title>Chilbi Admin – Schichtverwaltung Cl0.022</title>
 <meta property="og:title" content="Chilbi Herrliberg – Admin">
 <meta property="og:description" content="Schichtverwaltung Chilbi Herrliberg – Stützpunktfeuerwehr Meilen">
 <meta property="og:image" content="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png">
@@ -160,7 +160,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
     <img src="https://www.feuerwehr-meilen.ch/fileadmin/Public/Website/Templates/Images/Logo-FeuerwehrMeilen.png" alt="Feuerwehr Meilen" style="height:38px;width:auto;object-fit:contain;">
     <div class="logo-text">Chilbi Herrliberg<span>Admin – Schichtverwaltung</span></div>
     <div class="header-right">
-      <span class="header-version">Cl0.021</span>
+      <span class="header-version">Cl0.022</span>
       <button class="btn btn-sm" onclick="window.open('index.html','_blank')">Zu Schichtplan Signup</button>
       <button class="btn btn-sm btn-red" onclick="loadData()">↺ Aktualisieren</button>
     </div>
@@ -279,7 +279,7 @@ td input[type=color]{width:36px;height:26px;padding:1px;cursor:pointer;border:1p
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl0.021</div>
+<div class="site-footer">© Stützpunktfeuerwehr Meilen / LOL &nbsp;·&nbsp; Admin &nbsp;·&nbsp; Cl0.022</div>
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz9sKAjkwW-0IZlQUD4hTICAhgzoDxaPXXZwGW1euX519Y2TilJUllZpb9PwwPnEnMSHg/exec';
@@ -450,27 +450,41 @@ async function saveConfig() {
 function renderSignups() {
   const tagSel = document.getElementById('filterTag');
   const schSel = document.getElementById('filterSchicht');
-  // Tags sortiert nach Datum aus CONFIG
-  const tagDates = {};
-  SIGNUPS.forEach(s=>{ const cfg=CONFIG.find(r=>r.Tag===s.Tag)||{}; tagDates[s.Tag]=cfg.Datum||cfg.TagLabel||s.Tag; });
-  const tags = [...new Set(SIGNUPS.map(s=>s.Tag))].sort((a,b)=>String(tagDates[a]).localeCompare(String(tagDates[b]),'de'));
+  // Datum-Gruppen: eindeutige Daten aus CONFIG, sortiert
+  function datumToWochentag(datum) {
+    const m = datum.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})?/);
+    if (!m) return datum;
+    const day=parseInt(m[1]),month=parseInt(m[2])-1;
+    const yr=m[3]?(m[3].length===2?2000+parseInt(m[3]):parseInt(m[3])):new Date().getFullYear();
+    const d=new Date(yr,month,day);
+    if(isNaN(d.getTime())) return datum;
+    const WD=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+    return WD[d.getDay()]+', '+String(day).padStart(2,'0')+'.'+String(month+1).padStart(2,'0')+'.'+yr;
+  }
+  // Gruppiere nach Datum aus CONFIG
+  const datumMap = {}; // datum → [tag-ids]
+  SIGNUPS.forEach(s=>{ const cfg=CONFIG.find(r=>r.Tag===s.Tag)||{}; const datum=cfg.Datum||cfg.TagLabel||s.Tag; if(!datumMap[datum]) datumMap[datum]=[]; if(!datumMap[datum].includes(s.Tag)) datumMap[datum].push(s.Tag); });
+  const datums = Object.keys(datumMap).sort();
   const schs = [...new Set(SIGNUPS.map(s=>s.Schicht))];
   const curTag = tagSel.value, curSch = schSel.value;
   const aufgSel = document.getElementById('filterAufgabe');
   const curAufg = aufgSel?.value || '';
   const aufgs = [...new Set(SIGNUPS.map(s=>s.Aufgabe))].sort();
-  tagSel.innerHTML = '<option value="">Alle Tage</option>' + tags.map(t=>`<option value="${esc(t)}"${t===curTag?' selected':''}>${esc(tagDates[t]||t)}</option>`).join('');
+  // Dropdown: value = Datum-String, label = Wochentag
+  tagSel.innerHTML = '<option value="">Alle Tage</option>' + datums.map(datum=>`<option value="${esc(datum)}"${datum===curTag?' selected':''}>${esc(datumToWochentag(datum))}</option>`).join('');
   schSel.innerHTML = '<option value="">Alle Schichten</option>' + schs.map(s=>`<option value="${esc(s)}"${s===curSch?' selected':''}>${esc(s)}</option>`).join('');
   if(aufgSel) aufgSel.innerHTML = '<option value="">Alle Aufgaben</option>' + aufgs.map(a=>`<option value="${esc(a)}"${a===curAufg?' selected':''}>${esc(a)}</option>`).join('');
   tagSel.value = curTag; schSel.value = curSch; if(aufgSel) aufgSel.value = curAufg;
 
   const nameQ = document.getElementById('filterName').value.toLowerCase();
   const aufgQ = document.getElementById('filterAufgabe')?.value || '';
-  const filtered = SIGNUPS.filter(s =>
-    (!nameQ || String(s.Tag||'').toLowerCase().includes(nameQ)) &&
-    (!curTag || s.Tag===curTag) && (!curSch || s.Schicht===curSch) &&
-    (!aufgQ || s.Aufgabe===aufgQ)
-  );
+  const filtered = SIGNUPS.filter(s => {
+    const cfg=CONFIG.find(r=>r.Tag===s.Tag)||{};
+    const datum=cfg.Datum||cfg.TagLabel||s.Tag;
+    return (!nameQ || String(s.Tag||'').toLowerCase().includes(nameQ)) &&
+      (!curTag || datum===curTag) && (!curSch || s.Schicht===curSch) &&
+      (!aufgQ || s.Aufgabe===aufgQ);
+  });
 
   const tbody = document.getElementById('signupBody');
   if (!filtered.length) {
@@ -620,13 +634,12 @@ function printDay(dayId) {
       const max=parseInt(r.MaxPersonen)||1;
       const color=r.Farbe||'#CC0000';
       // Namen
-      const namedLines = taken.map(s=>`<div style="border-bottom:1px solid rgba(255,255,255,.4);padding:1px 4px;font-size:9px">${s.Name}</div>`).join('');
-      // Leere Zeilen für Stift
-      const emptyLines = Array.from({length:Math.max(0,max-taken.length)},()=>`<div style="border-bottom:1px solid rgba(255,255,255,.4);padding:1px 4px;font-size:9px">&nbsp;</div>`).join('');
+      const namedLines = taken.map(s=>`<div class="name-line" style="font-weight:600">${s.Name}</div>`).join('');
+      const emptyLines = Array.from({length:Math.max(0,max-taken.length)},()=>`<div class="name-line">&nbsp;</div>`).join('');
       schHtml+=`<div style="display:flex;align-items:center;margin-bottom:4px;">
         <div style="width:120px;min-width:120px;font-size:10px;font-weight:600;padding-right:8px">${r.Aufgabe}</div>
         <div style="position:relative;width:${totalPx}px;height:auto;min-height:20px;">
-          <div style="position:absolute;left:${leftPx}px;width:${widePx}px;background:${color};min-height:20px;padding:2px 0;">
+          <div class="block" style="position:absolute;left:${leftPx}px;width:${widePx}px;min-height:${Math.max(20,(max)*16)}px;padding:2px 0;">
             ${namedLines}${emptyLines}
           </div>
         </div>
@@ -643,6 +656,8 @@ function printDay(dayId) {
       *{box-sizing:border-box;margin:0;padding:0;}
       body{font-family:'Open Sans',Arial,sans-serif;font-size:11px;padding:12mm;}
       @page{size:A3 landscape;margin:12mm;}
+      .block{background:white!important;border:1.5px solid black!important;color:black!important;}
+      .name-line{border-bottom:1px solid #999;padding:2px 4px;font-size:10px;min-height:16px;}
     </style>
   </head><body>
     <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:12px;padding-bottom:8px;border-bottom:3px solid black;">
